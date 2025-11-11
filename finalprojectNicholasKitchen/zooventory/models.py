@@ -1,9 +1,37 @@
 from django.db import models
 from django.conf import settings
 
+# --- UniqueAnimal model ---
+class UniqueAnimal(models.Model):
+    # Basic and Scientific Name
+    name = models.CharField(max_length=100, unique=True)
+    scientific_name = models.CharField(max_length=150, blank=True, null=True)
+
+    # Taxonomy
+    kingdom = models.CharField(max_length=100, blank=True, null=True)
+    phylum = models.CharField(max_length=100, blank=True, null=True)
+    animal_class = models.CharField(max_length=100, blank=True, null=True)
+    order = models.CharField(max_length=100, blank=True, null=True)
+    family = models.CharField(max_length=100, blank=True, null=True)
+    genus = models.CharField(max_length=100, blank=True, null=True)
+
+    #Other Descriptive Fields
+
+    #Timestamp
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Unique Animal'
+        verbose_name_plural = 'Unique Animals'
+        ordering = ['name']
+
 # --- MyAnimal model ---
 class MyAnimal(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='animals')
+    unique_animal = models.ForeignKey(UniqueAnimal, on_delete=models.SET_NULL, null=True, blank=True, related_name='instances')
     name = models.CharField(max_length=100)
     species = models.CharField(max_length=100)
     age = models.PositiveIntegerField()  # CHECK (age >= 0) → PositiveIntegerField
@@ -22,3 +50,31 @@ class Food(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.amount} {self.measurement}"
+
+# --- Log model ---
+class Log(models.Model):
+    FEEDING = 'feeding'
+    WEIGHT_UPDATE = 'weight_update'
+    NOTE = 'note'
+    OTHER = 'other'
+
+    LOG_TYPE_CHOICES = [
+        (FEEDING, 'Feeding'),
+        (WEIGHT_UPDATE, 'Weight Update'),
+        (NOTE, 'Note'),
+        (OTHER, 'Other'),
+    ]
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='logs')
+    myanimal = models.ForeignKey(MyAnimal, on_delete=models.CASCADE, related_name='logs')
+    food = models.ForeignKey(Food, on_delete=models.SET_NULL, null=True, blank=True, related_name='logs')
+    log_type = models.CharField(max_length=50, choices=LOG_TYPE_CHOICES, default=FEEDING)
+    description = models.TextField(null=True, blank=True)
+
+    amount_fed = models.FloatField(null=True, blank=True)
+    measurement = models.TextField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.myanimal.name} - {self.log_type} ({self.created_at:%m-%d-%Y %H:%M})"
