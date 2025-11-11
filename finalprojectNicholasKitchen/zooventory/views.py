@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Animal, Food
+from .models import MyAnimal, Food
 from django.utils import timezone
 
 # -----------------------------
@@ -37,57 +37,57 @@ def dashboard(request):
 
 
 # -----------------------------
-# Animal CRUD
+# MyAnimal CRUD
 # -----------------------------
 
 @login_required
-def animal_index(request):
-    animals = Animal.objects.filter(owner=request.user)
-    return render(request, 'zooventory/animal/index.html', {'animals': animals})
+def myanimal_index(request):
+    myanimals = MyAnimal.objects.filter(owner=request.user)
+    return render(request, 'zooventory/myanimal/index.html', {'myanimals': myanimals})
 
 
 @login_required
-def animal_create(request):
+def myanimal_create(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         species = request.POST.get('species')
         age = request.POST.get('age')
 
         if name and species and age:
-            Animal.objects.create(owner=request.user, name=name, species=species, age=age)
-            messages.success(request, 'Animal added successfully!')
-            return redirect('animal_index')
+            MyAnimal.objects.create(owner=request.user, name=name, species=species, age=age)
+            messages.success(request, 'MyAnimal added successfully!')
+            return redirect('myanimal_index')
         else:
             messages.error(request, 'Please fill out all fields.')
 
-    return render(request, 'zooventory/animal/create.html')
+    return render(request, 'zooventory/myanimal/create.html')
 
 
 @login_required
-def animal_update(request, id):
-    animal = get_object_or_404(Animal, id=id, owner=request.user)
+def myanimal_update(request, id):
+    myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
 
     if request.method == 'POST':
-        animal.name = request.POST.get('name', animal.name)
-        animal.species = request.POST.get('species', animal.species)
-        animal.age = request.POST.get('age', animal.age)
-        animal.save()
-        messages.success(request, 'Animal updated successfully!')
-        return redirect('animal_index')
+        myanimal.name = request.POST.get('name', myanimal.name)
+        myanimal.species = request.POST.get('species', myanimal.species)
+        myanimal.age = request.POST.get('age', myanimal.age)
+        myanimal.save()
+        messages.success(request, 'MyAnimal updated successfully!')
+        return redirect('myanimal_index')
 
-    return render(request, 'zooventory/animal/update.html', {'animal': animal})
+    return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
 
 
 @login_required
-def animal_delete(request, id):
-    animal = get_object_or_404(Animal, id=id, owner=request.user)
+def myanimal_delete(request, id):
+    myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
 
     if request.method == 'POST':
-        animal.delete()
-        messages.success(request, 'Animal deleted.')
-        return redirect('animal_index')
+        myanimal.delete()
+        messages.success(request, 'MyAnimal deleted.')
+        return redirect('myanimal_index')
 
-    return redirect('animal_index')
+    return redirect('myanimal_index')
 
 
 # -----------------------------
@@ -145,34 +145,34 @@ def food_delete(request, id):
 
 
 # -----------------------------
-# Calculator: Feed an Animal
+# Calculator: Feed a MyAnimal
 # -----------------------------
 
 @login_required
-def feed_animal(request):
-    animals = Animal.objects.filter(owner=request.user)
+def feed_myanimal(request):
+    myanimals = MyAnimal.objects.filter(owner=request.user)
     food_items = Food.objects.filter(owner=request.user)
 
     if request.method == 'POST':
-        animal_id = request.POST.get('animal_id')
+        myanimal_id = request.POST.get('myanimal_id')
         food_id = request.POST.get('food_id')
         amount = float(request.POST.get('amount', 0))
 
-        animal = get_object_or_404(Animal, id=animal_id, owner=request.user)
+        myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
         food = get_object_or_404(Food, id=food_id, owner=request.user)
 
         if food.amount >= amount > 0:
             food.amount -= amount
             food.save()
-            animal.last_fed = timezone.now()
-            animal.save()
-            messages.success(request, f'{animal.name} has been fed!')
+            myanimal.last_fed = timezone.now()
+            myanimal.save()
+            messages.success(request, f'{myanimal.name} has been fed!')
         else:
             messages.error(request, 'Not enough food available.')
 
         return redirect('calculator')
 
     return render(request, 'zooventory/calculator/feed.html', {
-        'animals': animals,
+        'myanimals': myanimals,
         'food': food_items,
     })

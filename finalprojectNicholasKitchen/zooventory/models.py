@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
 
-# --- Animal model ---
-class Animal(models.Model):
+# --- MyAnimal model ---
+class MyAnimal(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='animals')
     name = models.CharField(max_length=100)
     species = models.CharField(max_length=100)

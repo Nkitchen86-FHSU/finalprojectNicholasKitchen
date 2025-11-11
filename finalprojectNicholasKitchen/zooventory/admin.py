@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Animal, Food
+from .models import MyAnimal, Food
 
 
-@admin.register(Animal)
-class AnimalAdmin(admin.ModelAdmin):
+@admin.register(MyAnimal)
+class MyAnimalAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'species', 'age', 'owner', 'last_fed')
     list_filter = ('species',)
     search_fields = ('name', 'species', 'owner__username')

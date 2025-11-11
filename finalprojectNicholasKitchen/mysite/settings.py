@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'zooventory.apps.ZooventoryConfig',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
