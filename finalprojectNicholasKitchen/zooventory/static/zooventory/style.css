@@ -1,0 +1,52 @@
+/* Custom Zooventory Theme */
+:root {
+    --bs-primary: #1e7e34;   /* Darker green for primary buttons and links */
+    --bs-body-bg: #f5f5dc;   /* Beige background for the page */
+    --bs-body-color: #212529; /* Default text color */
+}
+
+/* Page background */
+body, html {
+    height: 100%;
+    background-color: #f5f5dc;  /* Beige background for the page */
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure main content stretches to bottom */
+main {
+    min-height: calc(100vh - 56px); /* 56px = navbar height */
+    padding: 2rem;
+}
+
+/* Navbar theme */
+.navbar {
+    background-color: #1c3a1f; /* Darker green/navy-like for navbar */
+}
+
+/* Navbar links */
+.navbar .nav-link, .navbar .navbar-brand {
+    color: #f5f5dc !important;  /* Beige links to contrast navbar */
+    font-weight: 500;
+}
+
+.navbar .nav-link:hover, .navbar .navbar-brand:hover {
+    color: #dcd0b3 !important;  /* Slightly lighter beige on hover */
+}
+
+/* Primary buttons (dark green) */
+.btn-primary {
+    background-color: #1e7e34;
+    border-color: #1e7e34;
+}
+
+.btn-primary:hover {
+    background-color: #155724;
+    border-color: #0f3d1e;
+}
+
+/* Modal headers */
+.modal-header {
+    background-color: #1e7e34;
+    color: white;
+}

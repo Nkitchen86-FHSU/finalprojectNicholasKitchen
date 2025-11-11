@@ -1,0 +1,39 @@
+{% extends 'zooventory/base.html' %}
+
+{% block title %}Animals{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-dark fw-bold">Animals</h1>
+        {% if user.is_authenticated %}
+        <a href="{% url 'animal_create' %}" class="btn btn-primary">+ Add New Animal</a>
+        {% endif %}
+    </div>
+
+    {% if animals %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for a in animals %}
+            <div class="col">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header text-light" style="background-color: #1e7e34;">
+                        <h5 class="mb-0">{{ a.name }}</h5>
+                    </div>
+                    <div class="card-body" style="background-color: #f5f5dc;">
+                        <p><strong>Species:</strong> {{ a.species }}</p>
+                        <p><strong>Age:</strong> {{ a.age }}</p>
+                        <p><strong>Last Fed:</strong> {{ a.last_fed|default:"Never" }}</p>
+
+                        {% if user.id == a.owner.id %}
+                        <a href="{% url 'animal_update' a.id %}" class="btn btn-outline-success btn-sm mt-2">Edit</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center text-muted mt-5">No animals found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'zooventory/base.html' %}
+
+{% block header %}
+  <h1 class="text-center text-primary mb-4">{% block title %}Edit "{{ food.name }}"{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 mb-4">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input name="name" id="name" class="form-control" value="{{ form.name.value|default:food.name }}" required>
+        </div>
+        <div class="mb-3">
+          <label for="amount" class="form-label">Amount</label>
+          <input name="amount" id="amount" class="form-control" value="{{ form.amount.value|default:food.amount }}">
+        </div>
+        <div class="mb-3">
+          <label for="measurement" class="form-label">Measurement</label>
+          <input name="measurement" id="measurement" class="form-control" value="{{ form.measurement.value|default:food.measurement }}">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <form action="{% url 'food_delete' food.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Are you sure?');">Delete</button>
+  </form>
+</div>
+{% endblock %}
