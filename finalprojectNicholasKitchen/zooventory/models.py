@@ -3,6 +3,9 @@ from django.conf import settings
 
 # --- UniqueAnimal model ---
 class UniqueAnimal(models.Model):
+    # Owner if user created
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
     # Basic and Scientific Name
     name = models.CharField(max_length=100, unique=True)
     scientific_name = models.CharField(max_length=150, blank=True, null=True)
@@ -15,7 +18,8 @@ class UniqueAnimal(models.Model):
     family = models.CharField(max_length=100, blank=True, null=True)
     genus = models.CharField(max_length=100, blank=True, null=True)
 
-    #Other Descriptive Fields
+    # Characteristics
+    characteristics = models.JSONField(blank=True, null=True)
 
     #Timestamp
     created_at = models.DateTimeField(auto_now_add=True)

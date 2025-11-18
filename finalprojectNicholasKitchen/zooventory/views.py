@@ -1,10 +1,27 @@
+import requests
+
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import MyAnimal, Food
+from .models import MyAnimal, UniqueAnimal, Food
 from django.utils import timezone
+from django.conf import settings
+
+# -----------------------------
+# Fetch request for animal API
+# -----------------------------
+def fetch_uniqueanimal_data(name):
+    api_url = f'https://api.api-ninjas.com/v1/animals?name={name}'
+    headers = {"X-Api-Key": settings.API_NINJAS_KEY}
+
+    try:
+        response = requests.get(api_url, headers=headers, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return []
 
 # -----------------------------
 # Home / Dashboard Views
@@ -58,7 +75,7 @@ def myanimal_create(request):
             messages.success(request, 'MyAnimal added successfully!')
             return redirect('myanimal_index')
         else:
-            messages.error(request, 'Please fill out all fields.')
+            messages.error(request, 'Please fill out all required fields.')
 
     return render(request, 'zooventory/myanimal/create.html')
 
@@ -89,6 +106,145 @@ def myanimal_delete(request, id):
 
     return redirect('myanimal_index')
 
+# -----------------------------
+# UniqueAnimal CRUD
+# -----------------------------
+
+def uniqueanimal_index(request):
+    uniqueanimals = UniqueAnimal.objects.all()
+    return render(request, 'zooventory/uniqueanimal/index.html', {'uniqueanimals': uniqueanimals})
+
+
+def uniqueanimal_info(request, id):
+    uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
+    return render(request, 'zooventory/uniqueanimal/index.html', {'uniqueanimal': uniqueanimal})
+
+def uniqueanimal_create(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+
+        if not name:
+            messages.error(request, 'Name is required.')
+            return redirect('uniqueanimal_create')
+
+        if UniqueAnimal.objects.filter(name__iexact=name).exists():
+            messages.error(request, f'{name} already exists in the database!')
+            return redirect('uniqueanimal_index')
+
+        api_results = fetch_uniqueanimal_data(name)
+
+        if api_results:
+            api_animal = api_results[0]
+
+            taxonomy = api_animal.get('taxonomy', {})
+            characteristics = api_animal.get('characteristics', {})
+
+            UniqueAnimal.objects.create(
+                name = api_animal.get('name', name),
+                scientific_name = taxonomy.get('scientific_name'),
+                kingdom = taxonomy.get('kingdom'),
+                phylum = taxonomy.get('phylum'),
+                animal_class = taxonomy.get('animal_class'),
+                order = taxonomy.get('order'),
+                family = taxonomy.get('family'),
+                genus = taxonomy.get('genus'),
+                characteristics = characteristics
+            )
+
+        UniqueAnimal.objects.create(
+            owner=request.user,
+            name=name,
+            scientific_name=request.POST.get('scientific_name'),
+            kingdom=request.POST.get('kingdom'),
+            phylum=request.POST.get('phylum'),
+            animal_class=request.POST.get('animal_class'),
+            order=request.POST.get('order'),
+            family=request.POST.get('family'),
+            genus=request.POST.get('genus'),
+            characteristics={
+                'prey': request.POST.get('prey'),
+                'name_of_young': request.POST.get('name_of_young'),
+                'group_behavior': request.POST.get('group_behavior'),
+                'estimated_population_size': request.POST.get('estimated_population_size'),
+                'biggest_threat': request.POST.get('biggest_threat'),
+                'most_distinctive_feature': request.POST.get('most_distinctive_feature'),
+                'gestation_period': request.POST.get('gestation_period'),
+                'habitat': request.POST.get('habitat'),
+                'diet': request.POST.get('diet'),
+                'average_litter_size': request.POST.get('average_litter_size'),
+                'lifestyle': request.POST.get('lifestyle'),
+                'common_name': request.POST.get('common_name'),
+                'number_of_species': request.POST.get('number_of_species'),
+                'location': request.POST.get('location'),
+                'slogan': request.POST.get('slogan'),
+                'group': request.POST.get('group'),
+                'color': request.POST.get('color'),
+                'skin_type': request.POST.get('skin_type'),
+                'top_speed': request.POST.get('top_speed'),
+                'lifespan': request.POST.get('lifespan'),
+                'weight': request.POST.get('weight'),
+                'height': request.POST.get('height'),
+                'age_of_sexual_maturity': request.POST.get('age_of_sexual_maturity'),
+                'age_of_weaning': request.POST.get('age_of_weaning')
+            }
+        )
+        messages.success(request, 'UniqueAnimal added successfully!')
+        return redirect('uniqueanimal_index')
+
+    return render(request, 'zooventory/uniqueanimal/create')
+
+def uniqueanimal_update(request, id):
+    uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
+
+    if request.method == 'POST':
+        # Basic and Scientific Name
+        uniqueanimal.name = request.POST.get('name')
+        uniqueanimal.scientific_name = request.POST.get('scientific_name')
+
+        # Taxonomy
+        uniqueanimal.kingdom = request.POST.get('kingdom')
+        uniqueanimal.phylum = request.POST.get('phylum')
+        uniqueanimal.animal_class = request.POST.get('animal_class')
+        uniqueanimal.order = request.POST.get('order')
+        uniqueanimal.family = request.POST.get('family')
+        uniqueanimal.genus = request.POST.get('genus')
+
+        # Characteristics
+        characteristics = uniqueanimal.characteristics or {}
+        for field in [
+            'prey', 'name_of_young', 'group_behavior', 'estimated_population_size',
+            'biggest_threat', 'most_distinctive_feature', 'gestation_period',
+            'habitat', 'diet', 'average_litter_size', 'lifestyle', 'common_name',
+            'number_of_species', 'location', 'slogan', 'group', 'color',
+            'skin_type', 'top_speed', 'lifespan', 'weight', 'height',
+            'age_of_sexual_maturity', 'age_of_weaning'
+        ]:
+            characteristics[field] = request.POST.get(field)
+
+        uniqueanimal.characteristics = characteristics
+
+        uniqueanimal.save()
+        messages.success(request, 'UniqueAnimal updated successfully!')
+        return redirect('uniqueanimal_index')
+
+    return render(request, '/zooventory/uniqueanimal/update')
+
+def uniqueanimal_search(request):
+    results = None
+    query = ''
+
+    if request.method == 'POST':
+        query = request.POST.get('query', '').strip()
+
+        if query:
+            results = fetch_uniqueanimal_data(query)
+
+            # Handle API errors gracefully
+            if isinstance(results, str):
+                messages.error(request, 'Error contacting animal API. Please try again later.')
+                results = None
+
+    return render(request, 'zooventory/uniqueanimal/search', {'query': query, 'results': results})
 
 # -----------------------------
 # Food CRUD
@@ -161,14 +317,17 @@ def feed_myanimal(request):
         myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
         food = get_object_or_404(Food, id=food_id, owner=request.user)
 
-        if food.amount >= amount > 0:
-            food.amount -= amount
-            food.save()
-            myanimal.last_fed = timezone.now()
-            myanimal.save()
-            messages.success(request, f'{myanimal.name} has been fed!')
+        if food.amount > 0:
+            if food.amount >= amount:
+                food.amount -= amount
+                food.save()
+                myanimal.last_fed = timezone.now()
+                myanimal.save()
+                messages.success(request, f'{myanimal.name} has been fed!')
+            else:
+                messages.error(request, 'Not enough food to feed animal!')
         else:
-            messages.error(request, 'Not enough food available.')
+            messages.error(request, 'Food amount cannot be negative!')
 
         return redirect('calculator')
 
