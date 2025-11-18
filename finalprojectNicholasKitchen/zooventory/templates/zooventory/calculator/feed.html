@@ -12,10 +12,10 @@
             <form method="post" class="p-3">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <label for="animal_id" class="form-label fw-bold">Select Animal:</label>
-                    <select class="form-select" name="animal_id" id="animal_id" required>
+                    <label for="myanimal_id" class="form-label fw-bold">Select Animal:</label>
+                    <select class="form-select" name="myanimal_id" id="myanimal_id" required>
                         <option value="">-- Choose an animal --</option>
-                        {% for a in animals %}
+                        {% for a in myanimals %}
                             <option value="{{ a.id }}">{{ a.name }} ({{ a.species }})</option>
                         {% endfor %}
                     </select>

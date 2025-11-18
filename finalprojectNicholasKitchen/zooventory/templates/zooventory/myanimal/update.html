@@ -12,22 +12,22 @@
         {% csrf_token %}
         <div class="mb-3">
           <label for="name" class="form-label">Name</label>
-          <input name="name" id="name" class="form-control" value="{{ form.name.value|default:animal.name }}" required>
+          <input name="name" id="name" class="form-control" value="{{ form.name.value|default:myanimal.name }}" required>
         </div>
         <div class="mb-3">
           <label for="species" class="form-label">Species</label>
-          <input name="species" id="species" class="form-control" value="{{ form.species.value|default:animal.species }}">
+          <input name="species" id="species" class="form-control" value="{{ form.species.value|default:myanimal.species }}">
         </div>
         <div class="mb-3">
           <label for="age" class="form-label">Age</label>
-          <input name="age" id="age" type="number" min="0" class="form-control" value="{{ form.age.value|default:animal.age }}">
+          <input name="age" id="age" type="number" min="0" class="form-control" value="{{ form.age.value|default:myanimal.age }}">
         </div>
         <button type="submit" class="btn btn-primary w-100">Save Changes</button>
       </form>
     </div>
   </div>
 
-  <form action="{% url 'animal_delete' animal.id %}" method="post">
+  <form action="{% url 'myanimal_delete' myanimal.id %}" method="post">
     {% csrf_token %}
     <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Are you sure?');">Delete</button>
   </form>
