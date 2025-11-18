@@ -262,7 +262,7 @@ def uniqueanimal_update(request, id):
         messages.success(request, 'UniqueAnimal updated successfully!')
         return redirect('uniqueanimal_index')
 
-    return render(request, '/zooventory/uniqueanimal/update')
+    return render(request, 'zooventory/uniqueanimal/update')
 
 def uniqueanimal_search(request):
     results = None
@@ -279,7 +279,7 @@ def uniqueanimal_search(request):
                 messages.error(request, 'Error contacting animal API. Please try again later.')
                 results = None
 
-    return render(request, 'zooventory/uniqueanimal/search', {'query': query, 'results': results})
+    return render(request, 'zooventory/uniqueanimal/search.html', {'query': query, 'results': results})
 
 # -----------------------------
 # Food CRUD

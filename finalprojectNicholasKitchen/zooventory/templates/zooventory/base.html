@@ -13,7 +13,8 @@
         <ul class="navbar-nav ms-auto">
             {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'myanimal_index' %}">Animals</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'uniqueanimal_index' %}">UniqueAnimals</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'myanimal_index' %}">MyAnimals</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'food_index' %}">Food</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'calculator' %}">Calculator</a></li>
                 <li class="nav-item">
