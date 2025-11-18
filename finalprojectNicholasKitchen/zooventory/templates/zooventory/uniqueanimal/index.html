@@ -1,7 +1,122 @@
-{% extends 'zooventory/base.html' %}
-
-{% block header %}
-{% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Unique Animals</h2>
+        <div>
+            <a href="{% url 'uniqueanimal_search' %}" class="btn btn-primary">
+                Search Animals
+            </a>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
+                Add Animal
+            </button>
+        </div>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Scientific Name</th>
+                <th>Diet</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for animal in uniqueanimals %}
+            <tr>
+                <td>{{ animal.name }}</td>
+                <td>{{ animal.scientific_name }}</td>
+                <td>{{ animal.diet }}</td>
+                <td>
+                    {% if perms.zooventory.change_uniqueanimal %}
+                        <button class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#updateModal{{ animal.id }}">
+                            Update
+                        </button>
+                    {% else %}
+                        <span class="text-muted">No Permission</span>
+                    {% endif %}
+                </td>
+            </tr>
+
+            <!-- UPDATE MODAL -->
+            <div class="modal fade" id="updateModal{{ animal.id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Update {{ animal.name }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="POST" action="{% url 'uniqueanimal_update' animal.id %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Name</label>
+                                        <input type="text" name="name" class="form-control" value="{{ animal.name }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Scientific Name</label>
+                                        <input type="text" name="scientific_name" class="form-control"
+                                               value="{{ animal.scientific_name }}">
+                                    </div>
+                                    <hr>
+                                    <h5>Taxonomy</h5>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Kingdom</label>
+                                        <input type="text" name="kingdom" class="form-control" value="{{ animal.kingdom }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Phylum</label>
+                                        <input type="text" name="phylum" class="form-control" value="{{ animal.phylum }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Class</label>
+                                        <input type="text" name="animal_class" class="form-control" value="{{ animal.animal_class }}">
+                                    </div>
+                                    <!-- Add any other fields you want -->
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- END UPDATE MODAL -->
+
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Unique Animal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'uniqueanimal_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <label class="form-label">Animal Name (will search API)</label>
+                    <input type="text" name="name" class="form-control">
+                    <small class="text-muted">If API data exists, fields will autofill.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END CREATE MODAL -->
 {% endblock %}
