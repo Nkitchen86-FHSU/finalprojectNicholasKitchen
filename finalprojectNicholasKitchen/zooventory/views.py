@@ -31,7 +31,7 @@ def index(request):
     """Public landing page."""
     return render(request, 'zooventory/index.html')
 
-def register(request):
+def custom_register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -40,12 +40,27 @@ def register(request):
             messages.success(request, "Account created successfully!")
             return redirect('dashboard')
         else:
-            messages.error(request, "Registration failed. Please check your inputs.")
+            messages.error(request, "Registration failed. Ensure inputs are correct. Note: Password must be 8 or more characters.", extra_tags='register-error')
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
+def custom_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, "Login successful!")
+            return redirect('dashboard')
+
+        messages.error(request, "Incorrect username or password.", extra_tags='login-error')
+        return redirect('index')
+
+    return render(request, 'registration/register.html', {'form': form})
 
 @login_required
 def dashboard(request):
@@ -70,6 +85,16 @@ def myanimal_create(request):
         species = request.POST.get('species')
         age = request.POST.get('age')
 
+        try:
+            int(age)
+        except ValueError:
+            messages.error(request, "Age must be an integer.")
+            return render(request, 'zooventory/myanimal/create.html')
+
+        if int(age) <= 0:
+            messages.error(request, "Age must be over 0.")
+            return render(request, 'zooventory/myanimal/create.html')
+
         if name and species and age:
             MyAnimal.objects.create(owner=request.user, name=name, species=species, age=age)
             messages.success(request, 'MyAnimal added successfully!')
@@ -85,6 +110,16 @@ def myanimal_update(request, id):
     myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
 
     if request.method == 'POST':
+        try:
+            int(request.POST.get('age', myanimal.age))
+        except ValueError:
+            messages.error(request, "Age must be an integer.")
+            return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
+
+        if int(request.POST.get('age', myanimal.age)) <= 0:
+            messages.error(request, "Age must be over 0.")
+            return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
+
         myanimal.name = request.POST.get('name', myanimal.name)
         myanimal.species = request.POST.get('species', myanimal.species)
         myanimal.age = request.POST.get('age', myanimal.age)
@@ -262,6 +297,15 @@ def food_create(request):
         name = request.POST.get('name')
         amount = request.POST.get('amount')
         measurement = request.POST.get('measurement')
+        try:
+            float(amount)
+        except ValueError:
+            messages.error(request, 'Amount must be a number.')
+            return render(request, 'zooventory/food/create.html')
+
+        if float(amount) <= 0:
+            messages.error(request, "Amount must be over 0.")
+            return render(request, 'zooventory/food/create.html')
 
         if name and amount and measurement:
             Food.objects.create(owner=request.user, name=name, amount=amount, measurement=measurement)
@@ -278,6 +322,15 @@ def food_update(request, id):
     food = get_object_or_404(Food, id=id, owner=request.user)
 
     if request.method == 'POST':
+        try:
+            float(request.POST.get('amount', food.amount))
+        except ValueError:
+            messages.error(request, 'Amount must be a number.')
+            return render(request, 'zooventory/food/update.html', {'food': food})
+
+        if float(request.POST.get('amount', food.amount)) <= 0:
+            messages.error(request, "Amount must be over 0.")
+            return render(request, 'zooventory/food/update.html', {'food': food})
         food.name = request.POST.get('name', food.name)
         food.amount = request.POST.get('amount', food.amount)
         food.measurement = request.POST.get('measurement', food.measurement)

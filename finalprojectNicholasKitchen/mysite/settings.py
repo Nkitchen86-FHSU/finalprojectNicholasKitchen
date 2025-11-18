@@ -125,11 +125,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MESSAGE_TAGS = {
-    messages.ERROR: 'login-error',
-    messages.SUCCESS: 'register-success',
-}
-
 # Redirects to log in and logout
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'index'
