@@ -19,7 +19,23 @@ class UniqueAnimal(models.Model):
     genus = models.CharField(max_length=100, blank=True, null=True)
 
     # Characteristics
-    characteristics = models.JSONField(blank=True, null=True)
+    prey = models.CharField(max_length=255, blank=True, null=True)
+    name_of_young = models.CharField(max_length=255, blank=True, null=True)
+    group_behavior = models.CharField(max_length=255, blank=True, null=True)
+    estimated_population_size = models.CharField(max_length=255, blank=True, null=True)
+    biggest_threat = models.CharField(max_length=255, blank=True, null=True)
+    most_distinctive_feature = models.CharField(max_length=255, blank=True, null=True)
+    gestation_period = models.CharField(max_length=255, blank=True, null=True)
+    habitat = models.CharField(max_length=255, blank=True, null=True)
+    diet = models.CharField(max_length=255, blank=True, null=True)
+    average_litter_size = models.CharField(max_length=255, blank=True, null=True)
+    lifestyle = models.CharField(max_length=255, blank=True, null=True)
+    common_name = models.CharField(max_length=255, blank=True, null=True)
+    number_of_species = models.CharField(max_length=255, blank=True, null=True)
+    slogan = models.CharField(max_length=255, blank=True, null=True)
+    color = models.CharField(max_length=255, blank=True, null=True)
+    skin_type = models.CharField(max_length=255, blank=True, null=True)
+    top_speed = models.CharField(max_length=255, blank=True, null=True)
 
     #Timestamp
     created_at = models.DateTimeField(auto_now_add=True)
