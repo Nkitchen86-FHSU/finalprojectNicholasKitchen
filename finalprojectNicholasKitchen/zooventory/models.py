@@ -55,6 +55,27 @@ class Food(models.Model):
     def __str__(self):
         return f"{self.name} - {self.amount} {self.measurement}"
 
+# --- Feeding Schedule model ---
+class FeedingSchedule(models.Model):
+    DAILY = 'Daily'
+    WEEKLY = 'Weekly'
+    EVERY_X_HOURS = 'Every X Hours'
+
+    FREQUENCY_CHOICES = (
+        (DAILY, 'Daily'),
+        (WEEKLY, 'Weekly'),
+        (EVERY_X_HOURS, 'Every X Hours'),
+    )
+
+    myanimal = models.ForeignKey(MyAnimal, on_delete=models.CASCADE, related_name='feeding_schedules')
+    time_of_day = models.TimeField(null=True, blank=True)
+    frequency = models.CharField(max_length=50, choices=FREQUENCY_CHOICES, default=DAILY)
+    hours_interval = models.IntegerField(null=True, blank=True)
+    next_run = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.myanimal.name}'s next feeding is at {self.next_run}"
+
 # --- Log model ---
 class Log(models.Model):
     FEEDING = 'feeding'
