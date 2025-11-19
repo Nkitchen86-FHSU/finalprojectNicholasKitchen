@@ -272,6 +272,10 @@ def uniqueanimal_create_api(request):
 def uniqueanimal_update(request, id):
     uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
 
+    if uniqueanimal.owner != request.user:
+        messages.error(request, 'You do not have permission to update this Unique Animal.')
+        return redirect('uniqueanimal_index')
+
     if request.method == 'POST':
         # Basic and Scientific Name
         uniqueanimal.name = request.POST.get('name')
@@ -308,7 +312,7 @@ def uniqueanimal_update(request, id):
         messages.success(request, 'UniqueAnimal updated successfully!')
         return redirect('uniqueanimal_index')
 
-    return render(request, 'zooventory/uniqueanimal/update.html')
+    return render(request, 'zooventory/uniqueanimal/update.html', {'uniqueanimal': uniqueanimal})
 
 def uniqueanimal_search(request):
     results = None

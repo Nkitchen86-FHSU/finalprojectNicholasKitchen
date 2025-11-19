@@ -5,11 +5,6 @@
 
     <h2>Update {{ uniqueanimal.name }}</h2>
 
-    {% if uniqueanimal.owner_id != request.user_id %}
-        <p class="text-danger">You do not have permission to update this animal.</p>
-        <a href="{% url 'uniqueanimal_index' %}" class="btn btn-secondary mt-3">Back</a>
-    {% else %}
-
         <form method="POST">
             {% csrf_token %}
 
@@ -185,8 +180,6 @@
             <a href="{% url 'uniqueanimal_index' %}" class="btn btn-secondary mt-3">Cancel</a>
 
         </form>
-
-    {% endif %}
 
 </div>
 {% endblock %}
