@@ -12,6 +12,7 @@ urlpatterns = [
     path('uniqueanimal/', views.uniqueanimal_index, name='uniqueanimal_index'),
     path('uniqueanimal/<int:id>/info/', views.uniqueanimal_info, name='uniqueanimal_info'),
     path('uniqueanimal/create/', views.uniqueanimal_create, name='uniqueanimal_create'),
+    path('uniqueanimal/create/api', views.uniqueanimal_create_api, name='uniqueanimal_create_api'),
     path('uniqueanimal/<int:id>/update/', views.uniqueanimal_update, name='uniqueanimal_update'),
     path('uniqueanimal/search/', views.uniqueanimal_search, name='uniqueanimal_search'),
     path('food/', views.food_index, name='food_index'),

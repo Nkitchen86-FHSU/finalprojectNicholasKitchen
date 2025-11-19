@@ -3,96 +3,66 @@
 {% block content %}
 <div class="container mt-4">
 
-    <h2>Search Unique Animals</h2>
+    <h2>Search Animal API</h2>
 
-    <form method="POST" class="d-flex mt-3 mb-4">
+    <form method="POST" class="d-flex mb-4">
         {% csrf_token %}
-        <input type="text" name="query" value="{{ query }}" placeholder="Search animals..."
-               class="form-control me-2">
+        <input type="text" class="form-control me-2" name="query"
+               value="{{ query }}" placeholder="Search for animals...">
         <button class="btn btn-primary">Search</button>
     </form>
 
     {% if results %}
-        <h5>Search Results</h5>
+        <h4>Search Results</h4>
         <ul class="list-group mb-4">
-        {% for result in results|slice:":10" %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>{{ result.name }}</strong><br>
-                    <small>{{ result.taxonomy.scientific_name }}</small>
-                </div>
-                <button class="btn btn-success btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#createModal{{ forloop.counter }}">
-                    Add
-                </button>
-                <!-- CREATE MODAL FOR RESULT -->
-                <div class="modal fade" id="createModal{{ forloop.counter }}" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
 
-                            <div class="modal-header">
-                                <h5 class="modal-title">Add {{ result.name }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <form method="POST" action="{% url 'uniqueanimal_create' %}">
-                                {% csrf_token %}
-
-                                <div class="modal-body">
-                                    <input type="hidden" name="name" value="{{ result.name }}">
-                                    <input type="hidden" name="scientific_name" value="{{ result.taxonomy.scientific_name }}">
-
-                                    <p>Are you sure you want to add <strong>{{ result.name }}</strong>?</p>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-success">Add</button>
-                                </div>
-
-                            </form>
-
-                        </div>
+            {% for animal in results|slice:":10" %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ animal.name }}</strong><br>
+                        <small>{{ animal.taxonomy.scientific_name }}</small>
                     </div>
-                </div>
-                <!-- END CREATE MODAL -->
-            </li>
-        {% endfor %}
+
+                    <form action="{% url 'uniqueanimal_create_api' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="name"                       value="{{ animal.name }}">
+                        <input type="hidden" name="scientific_name"            value="{{ animal.taxonomy.scientific_name }}">
+                        <input type="hidden" name="kingdom"                    value="{{ animal.taxonomy.kingdom }}">
+                        <input type="hidden" name="phylum"                     value="{{ animal.taxonomy.phylum }}">
+                        <input type="hidden" name="animal_class"               value="{{ animal.taxonomy.class }}">
+                        <input type="hidden" name="order"                      value="{{ animal.taxonomy.order }}">
+                        <input type="hidden" name="family"                     value="{{ animal.taxonomy.family }}">
+                        <input type="hidden" name="genus"                      value="{{ animal.taxonomy.genus }}">
+                        <input type="hidden" name="prey"                       value="{{ animal.characteristics.prey }}">
+                        <input type="hidden" name="name_of_young"              value="{{ animal.characteristics.name_of_young }}">
+                        <input type="hidden" name="group_behavior"             value="{{ animal.characteristics.group_behavior }}">
+                        <input type="hidden" name="estimated_population_size"  value="{{ animal.characteristics.estimated_population_size }}">
+                        <input type="hidden" name="biggest_threat"             value="{{ animal.characteristics.biggest_threat }}">
+                        <input type="hidden" name="most_distinctive_feature"   value="{{ animal.characteristics.most_distinctive_feature }}">
+                        <input type="hidden" name="gestation_period"           value="{{ animal.characteristics.gestation_period }}">
+                        <input type="hidden" name="habitat"                    value="{{ animal.characteristics.habitat }}">
+                        <input type="hidden" name="diet"                       value="{{ animal.characteristics.diet }}">
+                        <input type="hidden" name="average_litter_size"        value="{{ animal.characteristics.average_litter_size }}">
+                        <input type="hidden" name="lifestyle"                  value="{{ animal.characteristics.lifestyle }}">
+                        <input type="hidden" name="common_name"                value="{{ animal.characteristics.common_name }}">
+                        <input type="hidden" name="number_of_species"          value="{{ animal.characteristics.number_of_species }}">
+                        <input type="hidden" name="slogan"                     value="{{ animal.characteristics.slogan }}">
+                        <input type="hidden" name="color"                      value="{{ animal.characteristics.color }}">
+                        <input type="hidden" name="skin_type"                  value="{{ animal.characteristics.skin_type }}">
+                        <input type="hidden" name="top_speed"                  value="{{ animal.characteristics.top_speed }}">
+
+                        <button class="btn btn-success btn-sm">Add</button>
+                    </form>
+                </li>
+            {% endfor %}
+
         </ul>
     {% endif %}
 
-    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#manualCreateModal">
-        Add New Manually
-    </button>
+    <a href="{% url 'uniqueanimal_create' %}" class="btn btn-secondary">
+        Create New Animal
+    </a>
+
 </div>
-
-<!-- MANUAL CREATE MODAL -->
-<div class="modal fade" id="manualCreateModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Add Animal Manually</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <form method="POST" action="{% url 'uniqueanimal_create' %}">
-                {% csrf_token %}
-
-                <div class="modal-body">
-                    <label class="form-label">Animal Name</label>
-                    <input type="text" name="name" class="form-control">
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Create</button>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-</div>
-<!-- END MANUAL CREATE MODAL -->
-
 {% endblock %}
+

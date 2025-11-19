@@ -152,7 +152,7 @@ def uniqueanimal_index(request):
 
 def uniqueanimal_info(request, id):
     uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
-    return render(request, 'zooventory/uniqueanimal/index.html', {'uniqueanimal': uniqueanimal})
+    return render(request, 'zooventory/uniqueanimal/info.html', {'uniqueanimal': uniqueanimal})
 
 def uniqueanimal_create(request):
     if request.method == 'POST':
@@ -168,7 +168,7 @@ def uniqueanimal_create(request):
 
         api_results = fetch_uniqueanimal_data(name)
 
-        if api_results:
+        if api_results and api_results[0].get('name', '').lower() == name.lower():
             api_animal = api_results[0]
 
             taxonomy = api_animal.get('taxonomy', {})
@@ -179,12 +179,31 @@ def uniqueanimal_create(request):
                 scientific_name = taxonomy.get('scientific_name'),
                 kingdom = taxonomy.get('kingdom'),
                 phylum = taxonomy.get('phylum'),
-                animal_class = taxonomy.get('animal_class'),
+                animal_class = taxonomy.get('class'),
                 order = taxonomy.get('order'),
                 family = taxonomy.get('family'),
                 genus = taxonomy.get('genus'),
-                characteristics = characteristics
+                prey=characteristics.get('prey'),
+                name_of_young=characteristics.get('name_of_young'),
+                group_behavior=characteristics.get('group_behavior'),
+                estimated_population_size=characteristics.get('estimated_population_size'),
+                biggest_threat=characteristics.get('biggest_threat'),
+                most_distinctive_feature=characteristics.get('most_distinctive_feature'),
+                gestation_period=characteristics.get('gestation_period'),
+                habitat=characteristics.get('habitat'),
+                diet=characteristics.get('diet'),
+                average_litter_size=characteristics.get('average_litter_size'),
+                lifestyle=characteristics.get('lifestyle'),
+                common_name=characteristics.get('common_name'),
+                number_of_species=characteristics.get('number_of_species'),
+                slogan=characteristics.get('slogan'),
+                color=characteristics.get('color'),
+                skin_type=characteristics.get('skin_type'),
+                top_speed=characteristics.get('top_speed'),
             )
+
+            messages.success(request, f'Imported {name} from the API successfully!')
+            return redirect('uniqueanimal_index')
 
         UniqueAnimal.objects.create(
             owner=request.user,
@@ -192,41 +211,63 @@ def uniqueanimal_create(request):
             scientific_name=request.POST.get('scientific_name'),
             kingdom=request.POST.get('kingdom'),
             phylum=request.POST.get('phylum'),
-            animal_class=request.POST.get('animal_class'),
+            animal_class=request.POST.get('class'),
             order=request.POST.get('order'),
             family=request.POST.get('family'),
             genus=request.POST.get('genus'),
-            characteristics={
-                'prey': request.POST.get('prey'),
-                'name_of_young': request.POST.get('name_of_young'),
-                'group_behavior': request.POST.get('group_behavior'),
-                'estimated_population_size': request.POST.get('estimated_population_size'),
-                'biggest_threat': request.POST.get('biggest_threat'),
-                'most_distinctive_feature': request.POST.get('most_distinctive_feature'),
-                'gestation_period': request.POST.get('gestation_period'),
-                'habitat': request.POST.get('habitat'),
-                'diet': request.POST.get('diet'),
-                'average_litter_size': request.POST.get('average_litter_size'),
-                'lifestyle': request.POST.get('lifestyle'),
-                'common_name': request.POST.get('common_name'),
-                'number_of_species': request.POST.get('number_of_species'),
-                'location': request.POST.get('location'),
-                'slogan': request.POST.get('slogan'),
-                'group': request.POST.get('group'),
-                'color': request.POST.get('color'),
-                'skin_type': request.POST.get('skin_type'),
-                'top_speed': request.POST.get('top_speed'),
-                'lifespan': request.POST.get('lifespan'),
-                'weight': request.POST.get('weight'),
-                'height': request.POST.get('height'),
-                'age_of_sexual_maturity': request.POST.get('age_of_sexual_maturity'),
-                'age_of_weaning': request.POST.get('age_of_weaning')
-            }
+            prey=request.POST.get('prey'),
+            name_of_young=request.POST.get('name_of_young'),
+            group_behavior=request.POST.get('group_behavior'),
+            estimated_population_size=request.POST.get('estimated_population_size'),
+            biggest_threat=request.POST.get('biggest_threat'),
+            most_distinctive_feature=request.POST.get('most_distinctive_feature'),
+            gestation_period=request.POST.get('gestation_period'),
+            habitat=request.POST.get('habitat'),
+            diet=request.POST.get('diet'),
+            average_litter_size=request.POST.get('average_litter_size'),
+            lifestyle=request.POST.get('lifestyle'),
+            common_name=request.POST.get('common_name'),
+            number_of_species=request.POST.get('number_of_species'),
+            slogan=request.POST.get('slogan'),
+            color=request.POST.get('color'),
+            skin_type=request.POST.get('skin_type'),
+            top_speed=request.POST.get('top_speed')
         )
-        messages.success(request, 'UniqueAnimal added successfully!')
+        messages.success(request, 'UniqueAnimal added successfully! (No API match found)')
         return redirect('uniqueanimal_index')
 
-    return render(request, 'zooventory/uniqueanimal/create')
+    return render(request, 'zooventory/uniqueanimal/create.html')
+
+def uniqueanimal_create_api(request):
+    UniqueAnimal.objects.create(
+        name=request.POST.get('name'),
+        scientific_name=request.POST.get('scientific_name'),
+        kingdom=request.POST.get('kingdom'),
+        phylum=request.POST.get('phylum'),
+        animal_class=request.POST.get('animal_class'),
+        order=request.POST.get('order'),
+        family=request.POST.get('family'),
+        genus=request.POST.get('genus'),
+        prey=request.POST.get('prey'),
+        name_of_young=request.POST.get('name_of_young'),
+        group_behavior=request.POST.get('group_behavior'),
+        estimated_population_size=request.POST.get('estimated_population_size'),
+        biggest_threat=request.POST.get('biggest_threat'),
+        most_distinctive_feature=request.POST.get('most_distinctive_feature'),
+        gestation_period=request.POST.get('gestation_period'),
+        habitat=request.POST.get('habitat'),
+        diet=request.POST.get('diet'),
+        average_litter_size=request.POST.get('average_litter_size'),
+        lifestyle=request.POST.get('lifestyle'),
+        common_name=request.POST.get('common_name'),
+        number_of_species=request.POST.get('number_of_species'),
+        slogan=request.POST.get('slogan'),
+        color=request.POST.get('color'),
+        skin_type=request.POST.get('skin_type'),
+        top_speed=request.POST.get('top_speed')
+    )
+    messages.success(request, 'UniqueAnimal added successfully!')
+    return redirect('uniqueanimal_index')
 
 def uniqueanimal_update(request, id):
     uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
@@ -245,24 +286,29 @@ def uniqueanimal_update(request, id):
         uniqueanimal.genus = request.POST.get('genus')
 
         # Characteristics
-        characteristics = uniqueanimal.characteristics or {}
-        for field in [
-            'prey', 'name_of_young', 'group_behavior', 'estimated_population_size',
-            'biggest_threat', 'most_distinctive_feature', 'gestation_period',
-            'habitat', 'diet', 'average_litter_size', 'lifestyle', 'common_name',
-            'number_of_species', 'location', 'slogan', 'group', 'color',
-            'skin_type', 'top_speed', 'lifespan', 'weight', 'height',
-            'age_of_sexual_maturity', 'age_of_weaning'
-        ]:
-            characteristics[field] = request.POST.get(field)
-
-        uniqueanimal.characteristics = characteristics
+        uniqueanimal.prey = request.POST.get('prey')
+        uniqueanimal.name_of_young = request.POST.get('name_of_young')
+        uniqueanimal.group_behavior = request.POST.get('group_behavior')
+        uniqueanimal.estimated_population_size = request.POST.get('estimated_population_size')
+        uniqueanimal.biggest_threat = request.POST.get('biggest_threat')
+        uniqueanimal.most_distinctive_feature = request.POST.get('most_distinctive_feature')
+        uniqueanimal.gestation_period = request.POST.get('gestation_period')
+        uniqueanimal.habitat = request.POST.get('habitat')
+        uniqueanimal.diet = request.POST.get('diet')
+        uniqueanimal.average_litter_size = request.POST.get('average_litter_size')
+        uniqueanimal.lifestyle = request.POST.get('lifestyle')
+        uniqueanimal.common_name = request.POST.get('common_name')
+        uniqueanimal.number_of_species = request.POST.get('number_of_species')
+        uniqueanimal.slogan = request.POST.get('slogan')
+        uniqueanimal.color = request.POST.get('color')
+        uniqueanimal.skin_type = request.POST.get('skin_type')
+        uniqueanimal.top_speed = request.POST.get('top_speed')
 
         uniqueanimal.save()
         messages.success(request, 'UniqueAnimal updated successfully!')
         return redirect('uniqueanimal_index')
 
-    return render(request, 'zooventory/uniqueanimal/update')
+    return render(request, 'zooventory/uniqueanimal/update.html')
 
 def uniqueanimal_search(request):
     results = None

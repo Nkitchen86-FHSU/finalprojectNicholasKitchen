@@ -1,7 +1,60 @@
 {% extends 'zooventory/base.html' %}
 
-{% block header %}
-{% endblock %}
-
 {% block content %}
+<div class="container mt-4">
+
+    <h2>{{ uniqueanimal.name }}</h2>
+    <p><strong>Scientific Name:</strong> {{ uniqueanimal.scientific_name }}</p>
+
+    <hr>
+
+    <!-- TAXONOMY -->
+    <h4>Taxonomy</h4>
+    <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Kingdom:</strong> {{ uniqueanimal.kingdom }}</li>
+        <li class="list-group-item"><strong>Phylum:</strong> {{ uniqueanimal.phylum }}</li>
+        <li class="list-group-item"><strong>Class:</strong> {{ uniqueanimal.animal_class }}</li>
+        <li class="list-group-item"><strong>Order:</strong> {{ uniqueanimal.order }}</li>
+        <li class="list-group-item"><strong>Family:</strong> {{ uniqueanimal.family }}</li>
+        <li class="list-group-item"><strong>Genus:</strong> {{ uniqueanimal.genus }}</li>
+    </ul>
+
+    <hr>
+
+    <!-- CHARACTERISTICS -->
+    <h4>Characteristics</h4>
+    <ul class="list-group mb-4">
+
+        <li class="list-group-item"><strong>Prey:</strong> {{ uniqueanimal.prey }}</li>
+        <li class="list-group-item"><strong>Name of Young:</strong> {{ uniqueanimal.name_of_young }}</li>
+        <li class="list-group-item"><strong>Group Behavior:</strong> {{ uniqueanimal.group_behavior }}</li>
+        <li class="list-group-item"><strong>Estimated Population Size:</strong> {{ uniqueanimal.estimated_population_size }}</li>
+        <li class="list-group-item"><strong>Biggest Threat:</strong> {{ uniqueanimal.biggest_threat }}</li>
+        <li class="list-group-item"><strong>Most Distinctive Feature:</strong> {{ uniqueanimal.most_distinctive_feature }}</li>
+        <li class="list-group-item"><strong>Gestation Period:</strong> {{ uniqueanimal.gestation_period }}</li>
+        <li class="list-group-item"><strong>Habitat:</strong> {{ uniqueanimal.habitat }}</li>
+        <li class="list-group-item"><strong>Diet:</strong> {{ uniqueanimal.diet }}</li>
+        <li class="list-group-item"><strong>Average Litter Size:</strong> {{ uniqueanimal.average_litter_size }}</li>
+        <li class="list-group-item"><strong>Lifestyle:</strong> {{ uniqueanimal.lifestyle }}</li>
+        <li class="list-group-item"><strong>Common Name:</strong> {{ uniqueanimal.common_name }}</li>
+        <li class="list-group-item"><strong>Number of Species:</strong> {{ uniqueanimal.number_of_species }}</li>
+        <li class="list-group-item"><strong>Slogan:</strong> {{ uniqueanimal.slogan }}</li>
+        <li class="list-group-item"><strong>Color:</strong> {{ uniqueanimal.color }}</li>
+        <li class="list-group-item"><strong>Skin Type:</strong> {{ uniqueanimal.skin_type }}</li>
+        <li class="list-group-item"><strong>Top Speed:</strong> {{ uniqueanimal.top_speed }}</li>
+
+    </ul>
+
+    <hr>
+
+    <!-- OWNER / METADATA -->
+    <h4>Metadata</h4>
+    <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Created By:</strong> {{ uniqueanimal.owner }}</li>
+        <li class="list-group-item"><strong>Created At:</strong> {{ uniqueanimal.created_at }}</li>
+    </ul>
+
+    <a href="{% url 'uniqueanimal_index' %}" class="btn btn-secondary">Back</a>
+
+</div>
 {% endblock %}

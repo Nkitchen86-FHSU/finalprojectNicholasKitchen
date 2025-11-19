@@ -1,7 +1,155 @@
 {% extends 'zooventory/base.html' %}
 
-{% block header %}
-{% endblock %}
-
 {% block content %}
+<div class="container mt-4">
+
+    <h2>Create Unique Animal</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- BASIC INFORMATION -->
+        <h4>Basic Information</h4>
+
+        <div class="mb-3">
+            <label class="form-label">Name *</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Scientific Name</label>
+            <input type="text" name="scientific_name" class="form-control">
+        </div>
+
+        <hr>
+
+        <!-- TAXONOMY -->
+        <h4>Taxonomy</h4>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label>Kingdom</label>
+                <input type="text" name="kingdom" class="form-control">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>Phylum</label>
+                <input type="text" name="phylum" class="form-control">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>Class</label>
+                <input type="text" name="animal_class" class="form-control">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label>Order</label>
+                <input type="text" name="order" class="form-control">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>Family</label>
+                <input type="text" name="family" class="form-control">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>Genus</label>
+                <input type="text" name="genus" class="form-control">
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- CHARACTERISTICS -->
+        <h4>Characteristics</h4>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label>Prey</label>
+                <input type="text" name="prey" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Name of Young</label>
+                <input type="text" name="name_of_young" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Group Behavior</label>
+                <input type="text" name="group_behavior" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Estimated Population Size</label>
+                <input type="text" name="estimated_population_size" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Biggest Threat</label>
+                <input type="text" name="biggest_threat" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Most Distinctive Feature</label>
+                <input type="text" name="most_distinctive_feature" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Gestation Period</label>
+                <input type="text" name="gestation_period" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Habitat</label>
+                <input type="text" name="habitat" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Diet</label>
+                <input type="text" name="diet" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Average Litter Size</label>
+                <input type="text" name="average_litter_size" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Lifestyle</label>
+                <input type="text" name="lifestyle" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Common Name</label>
+                <input type="text" name="common_name" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Number of Species</label>
+                <input type="text" name="number_of_species" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Slogan</label>
+                <input type="text" name="slogan" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Color</label>
+                <input type="text" name="color" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Skin Type</label>
+                <input type="text" name="skin_type" class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Top Speed</label>
+                <input type="text" name="top_speed" class="form-control">
+            </div>
+        </div>
+
+        <button class="btn btn-success mt-3">Create Animal</button>
+        <a href="{% url 'uniqueanimal_index' %}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+
+</div>
 {% endblock %}
