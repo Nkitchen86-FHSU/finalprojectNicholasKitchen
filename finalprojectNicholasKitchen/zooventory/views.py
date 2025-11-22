@@ -13,9 +13,11 @@ from django.conf import settings
 # Fetch request for animal API
 # -----------------------------
 def fetch_uniqueanimal_data(name):
+    # Prepare API url and headers for it
     api_url = f'https://api.api-ninjas.com/v1/animals?name={name}'
     headers = {"X-Api-Key": settings.API_NINJAS_KEY}
 
+    # Try to fetch a request, return empty array if request cannot be completed
     try:
         response = requests.get(api_url, headers=headers, timeout=10)
         response.raise_for_status()
@@ -31,14 +33,27 @@ def index(request):
     """Public landing page."""
     return render(request, 'zooventory/index.html')
 
+@login_required
+def dashboard(request):
+    """User dashboard."""
+    return render(request, 'zooventory/dashboard/dashboard.html')
+
+# -----------------------------
+# Login / Registration Views
+# -----------------------------
+
 def custom_register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
+
+        # Ensure form was filled in correctly, then create the user
         if form.is_valid():
             user = form.save()
             login(request, user)
             messages.success(request, "Account created successfully!")
             return redirect('dashboard')
+
+        # Return error message with extra tag to automatically bring up register modal
         else:
             messages.error(request, "Registration failed. Ensure inputs are correct. Note: Password must be 8 or more characters.", extra_tags='register-error')
     else:
@@ -50,23 +65,20 @@ def custom_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
+        # Try to authenticate user with set username and password
         user = authenticate(request, username=username, password=password)
 
+        # Login user if authentication worked
         if user is not None:
             login(request, user)
             messages.success(request, "Login successful!")
             return redirect('dashboard')
 
+        # Return error message with extra tag to automatically bring up login modal
         messages.error(request, "Incorrect username or password.", extra_tags='login-error')
         return redirect('index')
 
-    return render(request, 'registration/register.html', {'form': form})
-
-@login_required
-def dashboard(request):
-    """User dashboard."""
-    return render(request, 'zooventory/dashboard/dashboard.html')
-
+    return render(request, 'registration/login.html')
 
 # -----------------------------
 # MyAnimal CRUD
@@ -85,16 +97,19 @@ def myanimal_create(request):
         species = request.POST.get('species')
         age = request.POST.get('age')
 
+        # Ensure myanimal age is an integer
         try:
             int(age)
         except ValueError:
             messages.error(request, "Age must be an integer.")
             return render(request, 'zooventory/myanimal/create.html')
 
+        # Ensure myanimal age is more than 0
         if int(age) <= 0:
             messages.error(request, "Age must be over 0.")
             return render(request, 'zooventory/myanimal/create.html')
 
+        # Create myanimal if all required field are filled
         if name and species and age:
             MyAnimal.objects.create(owner=request.user, name=name, species=species, age=age)
             messages.success(request, 'MyAnimal added successfully!')
@@ -110,16 +125,19 @@ def myanimal_update(request, id):
     myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
 
     if request.method == 'POST':
+        # Ensure myanimal age is an integer
         try:
             int(request.POST.get('age', myanimal.age))
         except ValueError:
             messages.error(request, "Age must be an integer.")
             return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
 
+        # Ensure myanimal age is more than 0
         if int(request.POST.get('age', myanimal.age)) <= 0:
             messages.error(request, "Age must be over 0.")
             return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
 
+        # Update and save myanimal changes
         myanimal.name = request.POST.get('name', myanimal.name)
         myanimal.species = request.POST.get('species', myanimal.species)
         myanimal.age = request.POST.get('age', myanimal.age)
@@ -158,16 +176,20 @@ def uniqueanimal_create(request):
     if request.method == 'POST':
         name = request.POST.get('name')
 
+        # Ensure the user entered a name
         if not name:
             messages.error(request, 'Name is required.')
             return redirect('uniqueanimal_create')
 
+        # Ensure the Unique Animal does not already exist in the database
         if UniqueAnimal.objects.filter(name__iexact=name).exists():
             messages.error(request, f'{name} already exists in the database!')
             return redirect('uniqueanimal_index')
 
+        # Search Animals API for animal name
         api_results = fetch_uniqueanimal_data(name)
 
+        # Create animal from Animals API if the first result matches the name
         if api_results and api_results[0].get('name', '').lower() == name.lower():
             api_animal = api_results[0]
 
@@ -202,9 +224,11 @@ def uniqueanimal_create(request):
                 top_speed=characteristics.get('top_speed'),
             )
 
+            # Let user know the Unique Animal information has been pulled from the Animals API
             messages.success(request, f'Imported {name} from the API successfully!')
             return redirect('uniqueanimal_index')
 
+        # Create the Unique Animal if the API did not have a match
         UniqueAnimal.objects.create(
             owner=request.user,
             name=name,
@@ -238,6 +262,7 @@ def uniqueanimal_create(request):
 
     return render(request, 'zooventory/uniqueanimal/create.html')
 
+# Alternate create function so the Animals API doesn't get searched twice
 def uniqueanimal_create_api(request):
     UniqueAnimal.objects.create(
         name=request.POST.get('name'),
@@ -272,13 +297,13 @@ def uniqueanimal_create_api(request):
 def uniqueanimal_update(request, id):
     uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
 
+    # Deny the update if the current user did not create the Unique Animal
     if uniqueanimal.owner != request.user:
         messages.error(request, 'You do not have permission to update this Unique Animal.')
         return redirect('uniqueanimal_index')
 
     if request.method == 'POST':
-        # Basic and Scientific Name
-        uniqueanimal.name = request.POST.get('name')
+        # Scientific Name. Base name cannot be modified since it is the unique identifier
         uniqueanimal.scientific_name = request.POST.get('scientific_name')
 
         # Taxonomy
@@ -308,6 +333,7 @@ def uniqueanimal_update(request, id):
         uniqueanimal.skin_type = request.POST.get('skin_type')
         uniqueanimal.top_speed = request.POST.get('top_speed')
 
+        # Save the Unique Animal
         uniqueanimal.save()
         messages.success(request, 'UniqueAnimal updated successfully!')
         return redirect('uniqueanimal_index')
@@ -321,6 +347,7 @@ def uniqueanimal_search(request):
     if request.method == 'POST':
         query = request.POST.get('query', '').strip()
 
+        # If there is a query, send it to the Animals API and return results to te user
         if query:
             results = fetch_uniqueanimal_data(query)
 
@@ -347,16 +374,20 @@ def food_create(request):
         name = request.POST.get('name')
         amount = request.POST.get('amount')
         measurement = request.POST.get('measurement')
+
+        # Ensure amount is a number
         try:
             float(amount)
         except ValueError:
             messages.error(request, 'Amount must be a number.')
             return render(request, 'zooventory/food/create.html')
 
+        # Ensure amount is more than 0
         if float(amount) <= 0:
             messages.error(request, "Amount must be over 0.")
             return render(request, 'zooventory/food/create.html')
 
+        # Create the food object if required fields are filled
         if name and amount and measurement:
             Food.objects.create(owner=request.user, name=name, amount=amount, measurement=measurement)
             messages.success(request, 'Food added successfully!')
@@ -372,15 +403,19 @@ def food_update(request, id):
     food = get_object_or_404(Food, id=id, owner=request.user)
 
     if request.method == 'POST':
+        # Ensure amount is a float value
         try:
             float(request.POST.get('amount', food.amount))
         except ValueError:
             messages.error(request, 'Amount must be a number.')
             return render(request, 'zooventory/food/update.html', {'food': food})
 
+        #Ensure amount is more than 0
         if float(request.POST.get('amount', food.amount)) <= 0:
             messages.error(request, "Amount must be over 0.")
             return render(request, 'zooventory/food/update.html', {'food': food})
+
+        # Save the changes
         food.name = request.POST.get('name', food.name)
         food.amount = request.POST.get('amount', food.amount)
         food.measurement = request.POST.get('measurement', food.measurement)
@@ -409,6 +444,7 @@ def food_delete(request, id):
 
 @login_required
 def feed_myanimal(request):
+    # Get all myanimals and food that the user owns
     myanimals = MyAnimal.objects.filter(owner=request.user)
     food_items = Food.objects.filter(owner=request.user)
 
@@ -420,7 +456,9 @@ def feed_myanimal(request):
         myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
         food = get_object_or_404(Food, id=food_id, owner=request.user)
 
+        # Ensure food amount is more than 0
         if food.amount > 0:
+            # Only subtract if there is enough food in inventory
             if food.amount >= amount:
                 food.amount -= amount
                 food.save()
@@ -434,6 +472,7 @@ def feed_myanimal(request):
 
         return redirect('calculator')
 
+    # Render the feed.html with the myanimals and food list for the user to choose from
     return render(request, 'zooventory/calculator/feed.html', {
         'myanimals': myanimals,
         'food': food_items,
