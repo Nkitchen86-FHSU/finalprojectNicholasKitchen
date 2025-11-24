@@ -109,12 +109,18 @@ def myanimal_create(request):
             int(weight_oz)
         except ValueError:
             messages.error(request, "Age and weight must be an integer.")
-            return render(request, 'zooventory/myanimal/create.html')
+            return render(request, 'zooventory/myanimal/create.html', {
+                'uniqueanimals': UniqueAnimal.objects.all(),
+                'current_species': default_species
+            })
 
         # Ensure myanimal age is more than 0
         if int(age) <= 0 or int(weight_lb) < 0 or int(weight_oz) < 0:
             messages.error(request, "Age and weight must be over 0.")
-            return render(request, 'zooventory/myanimal/create.html')
+            return render(request, 'zooventory/myanimal/create.html', {
+                'uniqueanimals': UniqueAnimal.objects.all(),
+                'current_species': default_species
+            })
 
         # Create myanimal if all required field are filled
         if name and species and age and weight_lb and weight_oz:
@@ -140,12 +146,21 @@ def myanimal_update(request, id):
             int(request.POST.get('age', myanimal.age))
         except ValueError:
             messages.error(request, "Age must be an integer.")
-            return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
+            return render(request, 'zooventory/myanimal/update.html', {
+                'myanimal': myanimal,
+                'uniqueanimals': UniqueAnimal.objects.all(),
+                'current_species': myanimal.species,
+            })
+
 
         # Ensure myanimal age is more than 0
         if int(request.POST.get('age', myanimal.age)) <= 0:
             messages.error(request, "Age must be over 0.")
-            return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
+            return render(request, 'zooventory/myanimal/update.html', {
+                'myanimal': myanimal,
+                'uniqueanimals': UniqueAnimal.objects.all(),
+                'current_species': myanimal.species,
+            })
 
         # Update and save myanimal changes
         myanimal.name = request.POST.get('name', myanimal.name)
@@ -394,12 +409,12 @@ def food_create(request):
             float(amount)
         except ValueError:
             messages.error(request, 'Amount must be a number.')
-            return render(request, 'zooventory/food/create.html')
+            return render(request, 'zooventory/food/create.html', { 'unit_choices': Food.UNIT_CHOICES })
 
         # Ensure amount is more than 0
         if float(amount) <= 0:
             messages.error(request, "Amount must be over 0.")
-            return render(request, 'zooventory/food/create.html')
+            return render(request, 'zooventory/food/create.html', { 'unit_choices': Food.UNIT_CHOICES })
 
         # Create the food object if required fields are filled
         if name and amount and unit:
@@ -422,12 +437,12 @@ def food_update(request, id):
             float(request.POST.get('amount', food.amount))
         except ValueError:
             messages.error(request, 'Amount must be a number.')
-            return render(request, 'zooventory/food/update.html', {'food': food})
+            return render(request, 'zooventory/food/update.html', {'food': food, 'unit_choices': Food.UNIT_CHOICES})
 
         #Ensure amount is more than 0
         if float(request.POST.get('amount', food.amount)) <= 0:
             messages.error(request, "Amount must be over 0.")
-            return render(request, 'zooventory/food/update.html', {'food': food})
+            return render(request, 'zooventory/food/update.html', {'food': food, 'unit_choices': Food.UNIT_CHOICES})
 
         # Save the changes
         food.name = request.POST.get('name', food.name)
