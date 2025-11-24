@@ -63,19 +63,38 @@ class MyAnimal(models.Model):
 
 # --- Food model ---
 class Food(models.Model):
+    # Weight measurements
+    GRAM = 'g'
+    OUNCE = 'oz'
+    POUND = 'lb'
+
+    # Volume Measurements
+    FLUID_OUNCE = 'fl oz'
+    GALLON = 'gal'
+    LITER = 'l'
+
+    MEASUREMENT_CHOICES = (
+        (GRAM, 'g'),
+        (OUNCE, 'oz'),
+        (POUND, 'lb'),
+        (FLUID_OUNCE, 'fl oz'),
+        (GALLON, 'gal'),
+        (LITER, 'L'),
+    )
+
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='foods')
     name = models.CharField(max_length=100)
     amount = models.FloatField(null=True, blank=True)  # CHECK (amount >= 0)
-    measurement = models.CharField(max_length=50)
+    measurement = models.CharField(max_length=20, choices=MEASUREMENT_CHOICES, default=POUND)
 
     def __str__(self):
         return f"{self.name} - {self.amount} {self.measurement}"
 
 # --- Feeding Schedule model ---
 class FeedingSchedule(models.Model):
-    DAILY = 'Daily'
-    WEEKLY = 'Weekly'
-    EVERY_X_HOURS = 'Every X Hours'
+    DAILY = 'daily'
+    WEEKLY = 'weekly'
+    EVERY_X_HOURS = 'every_x_hours'
 
     FREQUENCY_CHOICES = (
         (DAILY, 'Daily'),
