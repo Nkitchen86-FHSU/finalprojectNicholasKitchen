@@ -72,5 +72,51 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (async function() {
+        const response = await fetch('{% url 'chart_food_usage' %}');
+        const json = await response.json();
+
+        new Chart(document.getElementById('foodUsageChart'), {
+            type: 'line',
+            data: {
+                labels: json.labels,
+                datasets: [
+                    {
+                        label: 'Grams Used',
+                        data: json.grams,
+                        borderWidth:2,
+                        borderColor: 'green',
+                        backgroundColor: 'rgba(0, 128, 0, 0.2)',
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Milliliters Used',
+                        data: json.ml,
+                        borderWidth:2,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                spanGaps: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: function(value, index) {
+                                return this.getLabelForValue(value).slice(5);
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        })
+    })();
+</script>
 
 {% endblock %}

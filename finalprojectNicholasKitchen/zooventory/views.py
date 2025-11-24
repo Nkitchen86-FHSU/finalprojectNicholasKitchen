@@ -2,6 +2,7 @@ import requests
 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate
+from django.db.models.functions import TruncDate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -11,13 +12,12 @@ from django.utils import timezone
 from django.conf import settings
 from .models import MyAnimal, UniqueAnimal, Food, Log
 from zooventory.utils.conversions import *
-
-from .utils.conversions import convert_to_grams
-
+from datetime import timedelta
 
 # -----------------------------
 # Fetch request for animal API
 # -----------------------------
+
 def fetch_uniqueanimal_data(name):
     # Prepare API url and headers for it
     api_url = f'https://api.api-ninjas.com/v1/animals?name={name}'
@@ -592,14 +592,48 @@ def weigh_myanimal(request):
 # - Weight Trends
 # -----------------------------
 
+@login_required
 def chart_food_usage(request):
-    return
+    # Variables to display food usage over last 30 days
+    today = timezone.now().date()
+    start_date = today - timedelta(days=29)
+    date_list = [start_date + timedelta(days=i) for i in range(30)]
 
+    # Get all FEEDING logs
+    logs = (
+        Log.objects.filter(owner=request.user, log_type=Log.FEEDING, created_at__gte=start_date)
+        .annotate(created_date=TruncDate('created_at'))
+        .values('created_date')
+        .annotate(
+            total_grams=Sum('converted_amount_grams'),
+            total_ml=Sum('converted_amount_ml')
+        )
+        .order_by('created_date')
+    )
+
+    labels = []
+    data_grams = []
+    data_ml = []
+
+    log_map = {entry['created_date']: entry for entry in logs}
+
+    for date in date_list:
+        labels.append(date.strftime('%Y-%m-%d'))
+
+        entry = log_map.get(date, None)
+        data_grams.append(entry['total_grams'] if entry else 0)
+        data_ml.append(entry['total_ml'] if entry else 0)
+
+    return JsonResponse({'labels': labels, 'grams': data_grams, 'ml': data_ml})
+
+@login_required
 def chart_feeding_frequency(request):
     return
 
+@login_required
 def chart_top_food(request):
     return
 
+@login_required
 def chart_weight_trends(request):
     return
