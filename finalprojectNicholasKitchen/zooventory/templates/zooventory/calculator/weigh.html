@@ -1,0 +1,53 @@
+{% extends 'zooventory/base.html' %}
+
+{% block title %}Weigh an Animal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 600px;">
+        <div class="card-header text-center text-light" style="background-color: #1e7e34;">
+            <h2 class="mb-0">Weigh an Animal</h2>
+        </div>
+        <div class="card-body" style="background-color: #f5f5dc;">
+            <form method="post" class="p-3">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="myanimal_id" class="form-label fw-bold">Select Animal:</label>
+                    <select class="form-select" name="myanimal_id" id="myanimal_id" required>
+                        <option value="">-- Choose an animal --</option>
+                        {% for a in myanimals %}
+                            <option value="{{ a.id }}">{{ a.name }} ({{ a.species }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Weight</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input name="weight_lb" id="weight_lb"
+                               type="number" min="0"
+                               class="form-control w-auto"
+                               value="{{ form.weight_lb.value|default_if_none:'' }}" required>
+                        <span>lb</span>
+
+                        <input name="weight_oz" id="weight_oz"
+                               type="number" min="0"
+                               class="form-control w-auto"
+                               value="{{ form.weight_oz.value|default_if_none:'' }}" required>
+                        <span>oz</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="notes" class="form-label fw-bold">Additional Notes:</label>
+                    <textarea class="form-control" name="notes" id="notes" rows="4" style="resize: vertical;"></textarea>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Update Weight</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

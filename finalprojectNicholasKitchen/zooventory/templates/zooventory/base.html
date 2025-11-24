@@ -10,26 +10,71 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light px-3">
         <a class="navbar-brand" href="{% url 'index' %}">Zooventory</a>
-        <ul class="navbar-nav ms-auto">
-            {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'myanimal_index' %}">My Animals</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'uniqueanimal_index' %}">Species</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'food_index' %}">Food</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'calculator' %}">Calculator</a></li>
-                <li class="nav-item">
-                <li class="nav-item">
-                    <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-link">Log Out</button>
-                    </form>
-                </li>
-            {% else %}
-                <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Log In</a></li>
-            {% endif %}
-        </ul>
+
+        <!-- Hamburger Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
+                aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible Menu -->
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto">
+
+                {% if user.is_authenticated %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'myanimal_index' %}">My Animals</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'uniqueanimal_index' %}">Species</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'food_index' %}">Food</a>
+                    </li>
+
+                    <!-- Calculator Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="calculatorDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Calculator
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="calculatorDropdown">
+                            <li><a class="dropdown-item" href="{% url 'feed_myanimal' %}">Feed</a></li>
+                            <li><a class="dropdown-item" href="{% url 'weigh_myanimal' %}">Weigh</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Logout Button -->
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link bg-transparent border-0">Log Out</button>
+                        </form>
+                    </li>
+
+                {% else %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Log In</a>
+                    </li>
+
+                {% endif %}
+
+            </ul>
+        </div>
     </nav>
+
 
     <main>
         <section>

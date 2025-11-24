@@ -482,12 +482,23 @@ def feed_myanimal(request):
     if request.method == 'POST':
         myanimal_id = request.POST.get('myanimal_id')
         food_id = request.POST.get('food_id')
-        amount = float(request.POST.get('amount', 0))
+        amount = request.POST.get('amount', 0)
         notes = request.POST.get('notes')
 
         myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
         food = get_object_or_404(Food, id=food_id, owner=request.user)
         food_unit = food.unit
+
+        # Verify amount is a float
+        try:
+            float(amount)
+        except ValueError:
+            messages.error(request, 'Amount must be a number.')
+            return render(request, 'zooventory/calculator/feed.html', {
+                'myanimals': myanimals,
+                'food': food_items,
+            })
+        amount = float(amount)
 
         # Ensure food amount is more than 0
         if food.amount > 0:
@@ -512,10 +523,41 @@ def feed_myanimal(request):
         else:
             messages.error(request, 'Food amount cannot be negative!')
 
-        return redirect('calculator')
+        return redirect('feed_myanimal')
 
     # Render the feed.html with the myanimals and food list for the user to choose from
     return render(request, 'zooventory/calculator/feed.html', {
         'myanimals': myanimals,
         'food': food_items,
     })
+
+def weigh_myanimal(request):
+    myanimals = MyAnimal.objects.filter(owner=request.user)
+
+    if request.method == 'POST':
+        myanimal_id = request.POST.get('myanimal_id')
+        weight_lb = request.POST.get('weight_lb')
+        weight_oz = request.POST.get('weight_oz')
+        notes = request.POST.get('notes')
+
+        myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
+
+        try:
+            int(weight_lb)
+            int(weight_oz)
+        except ValueError:
+            messages.error(request, 'Weight inputs must be an integer.')
+            return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
+
+        if int(weight_lb) < 0 or int(weight_oz) < 0:
+            messages.error(request, 'Weight inputs cannot be negative.')
+            return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
+
+        myanimal.weight_lb = weight_lb
+        myanimal.weight_oz = weight_oz
+        myanimal.save()
+        Log.objects.create(owner=request.user, myanimal=myanimal, log_type=Log.WEIGHT_UPDATE, description=notes, weight_lb=weight_lb, weight_oz=weight_oz)
+        messages.success(request, 'Weight updated successfully!')
+        return redirect('weigh_myanimal')
+
+    return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
