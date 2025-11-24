@@ -508,12 +508,14 @@ def feed_myanimal(request):
                 'food': food_items,
             })
 
-        if amount <= 0:
+        if float(amount) <= 0:
             messages.error(request, 'Amount must be over 0.')
             return render(request, 'zooventory/calculator/feed.html', {
                 'myanimals': myanimals,
                 'food': food_items,
             })
+
+        amount = float(amount)
 
         # Ensure food amount is more than 0
         if food.amount > 0:
