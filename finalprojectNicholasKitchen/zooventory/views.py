@@ -5,9 +5,11 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import MyAnimal, UniqueAnimal, Food, Log
+from django.http import JsonResponse
+from django.db.models import Sum
 from django.utils import timezone
 from django.conf import settings
+from .models import MyAnimal, UniqueAnimal, Food, Log
 from zooventory.utils.conversions import *
 
 from .utils.conversions import convert_to_grams
@@ -93,7 +95,6 @@ def myanimal_index(request):
     myanimals = MyAnimal.objects.filter(owner=request.user)
     return render(request, 'zooventory/myanimal/index.html', {'myanimals': myanimals})
 
-
 @login_required
 def myanimal_create(request):
     uniqueanimals = UniqueAnimal.objects.all()
@@ -139,7 +140,6 @@ def myanimal_create(request):
         'current_species': default_species
     })
 
-
 @login_required
 def myanimal_update(request, id):
     myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
@@ -181,7 +181,6 @@ def myanimal_update(request, id):
         'uniqueanimals': UniqueAnimal.objects.all(),
         'current_species': myanimal.species,
     })
-
 
 @login_required
 def myanimal_delete(request, id):
@@ -407,7 +406,6 @@ def food_index(request):
     food_list = Food.objects.filter(owner=request.user)
     return render(request, 'zooventory/food/index.html', {'food_list': food_list})
 
-
 @login_required
 def food_create(request):
     if request.method == 'POST':
@@ -437,7 +435,6 @@ def food_create(request):
 
     return render(request, 'zooventory/food/create.html', { 'unit_choices': Food.UNIT_CHOICES })
 
-
 @login_required
 def food_update(request, id):
     food = get_object_or_404(Food, id=id, owner=request.user)
@@ -465,7 +462,6 @@ def food_update(request, id):
 
     return render(request, 'zooventory/food/update.html', {'food': food, 'unit_choices': Food.UNIT_CHOICES})
 
-
 @login_required
 def food_delete(request, id):
     food = get_object_or_404(Food, id=id, owner=request.user)
@@ -477,9 +473,10 @@ def food_delete(request, id):
 
     return redirect('food_index')
 
-
 # -----------------------------
-# Calculator: Feed a MyAnimal
+# Calculator:
+# - Feed a MyAnimal
+# - Weigh a MyAnimal
 # -----------------------------
 
 @login_required
@@ -587,3 +584,22 @@ def weigh_myanimal(request):
 
     return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
 
+# -----------------------------
+# Charts:
+# - Food Usage
+# - Feeding Frequency
+# - Top Food
+# - Weight Trends
+# -----------------------------
+
+def chart_food_usage(request):
+    return
+
+def chart_feeding_frequency(request):
+    return
+
+def chart_top_food(request):
+    return
+
+def chart_weight_trends(request):
+    return

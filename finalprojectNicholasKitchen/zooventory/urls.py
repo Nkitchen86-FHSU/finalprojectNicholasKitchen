@@ -33,4 +33,10 @@ urlpatterns = [
     # Calculator URLs
     path('calculator/feed/', views.feed_myanimal, name='feed_myanimal'),
     path('calculator/weigh/', views.weigh_myanimal, name='weigh_myanimal'),
+
+    # Chart URLs
+    path('chart/food-usage', views.chart_food_usage, name='chart_food_usage'),
+    path('chart/feeding-frequency', views.chart_feeding_frequency, name='chart_feeding_frequency'),
+    path('chart/top-food', views.chart_top_food, name='chart_top_food'),
+    path('chart/weight-trends', views.chart_weight_trends, name='chart_weight_trends'),
 ]
