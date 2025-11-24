@@ -18,7 +18,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-light fw-bold">
-                    Food Usage Over Time
+                    Food Usage Over Time - Last 30 Days
                 </div>
                 <div class="card-body">
                     <canvas id="foodUsageChart"></canvas>
@@ -30,7 +30,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-light fw-bold">
-                    Feeding Frequency by Animal
+                    Feeding Frequency by Animal - Last 30 Days
                 </div>
                 <div class="card-body">
                     <canvas id="feedingFrequencyChart"></canvas>
@@ -47,7 +47,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-warning fw-bold">
-                    Top Food Consumption
+                    Top Food Consumption - Last 30 Days
                 </div>
                 <div class="card-body">
                     <canvas id="topFoodChart"></canvas>
@@ -59,7 +59,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-danger text-light fw-bold">
-                    Animal Weight Trends
+                    Animal Weight Trends - Last 30 Days
                 </div>
                 <div class="card-body">
                     <canvas id="weightTrendChart"></canvas>
@@ -73,6 +73,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Food Usage Chart
     (async function() {
         const response = await fetch('{% url 'chart_food_usage' %}');
         const json = await response.json();
@@ -112,6 +113,44 @@
                     },
                     y: {
                         beginAtZero: true
+                    }
+                }
+            }
+        })
+    })();
+
+    // Feeding Frequency Chart
+    (async function() {
+        const response = await fetch('{% url 'chart_feeding_frequency' %}');
+        const json = await response.json();
+
+        new Chart(document.getElementById('feedingFrequencyChart'), {
+            type: 'bar',
+            data: {
+                labels: json.labels,
+                datasets: [
+                    {
+                        label: 'Feedings',
+                        data: json.total,
+                        borderWidth:2,
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        backgroundColor: 'rgba(0, 123, 255, 0.3)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
                     }
                 }
             }
