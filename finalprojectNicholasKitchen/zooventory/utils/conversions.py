@@ -19,7 +19,7 @@ def convert_to_grams(amount, unit):
     return None
 
 # Convert volume to milliliters. Return none if unit is unknown
-def convert_to_volume(amount, unit):
+def convert_to_ml(amount, unit):
     if unit in VOLUME_CONVERSION:
         return amount * VOLUME_CONVERSION[unit]
     return None

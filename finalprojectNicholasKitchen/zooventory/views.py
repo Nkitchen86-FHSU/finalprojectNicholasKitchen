@@ -8,6 +8,10 @@ from django.contrib import messages
 from .models import MyAnimal, UniqueAnimal, Food, Log
 from django.utils import timezone
 from django.conf import settings
+from zooventory.utils.conversions import *
+
+from .utils.conversions import convert_to_grams
+
 
 # -----------------------------
 # Fetch request for animal API
@@ -503,7 +507,13 @@ def feed_myanimal(request):
                 'myanimals': myanimals,
                 'food': food_items,
             })
-        amount = float(amount)
+
+        if amount <= 0:
+            messages.error(request, 'Amount must be over 0.')
+            return render(request, 'zooventory/calculator/feed.html', {
+                'myanimals': myanimals,
+                'food': food_items,
+            })
 
         # Ensure food amount is more than 0
         if food.amount > 0:
@@ -511,14 +521,21 @@ def feed_myanimal(request):
             if food.amount >= amount:
                 food.amount -= amount
                 food.save()
+
+                converted_grams = convert_to_grams(amount, food_unit)
+                converted_ml = convert_to_ml(amount, food_unit)
+
                 myanimal.last_fed = timezone.now()
                 myanimal.save()
+
                 Log.objects.create(
                     owner=request.user,
                     myanimal=myanimal,
                     food=food,
                     amount_fed=amount,
                     unit=food_unit,
+                    converted_amount_grams=converted_grams,
+                    converted_amount_ml=converted_ml,
                     log_type=Log.FEEDING,
                     description=notes
                 )
@@ -559,11 +576,12 @@ def weigh_myanimal(request):
             messages.error(request, 'Weight inputs cannot be negative.')
             return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
 
-        myanimal.weight_lb = int(weight_lb)
-        myanimal.weight_oz = int(weight_oz)
+        myanimal.weight_lb = weight_lb
+        myanimal.weight_oz = weight_oz
         myanimal.save()
         Log.objects.create(owner=request.user, myanimal=myanimal, log_type=Log.WEIGHT_UPDATE, description=notes, weight_lb=weight_lb, weight_oz=weight_oz)
         messages.success(request, 'Weight updated successfully!')
         return redirect('weigh_myanimal')
 
     return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
+
