@@ -3,11 +3,11 @@
 {% block content %}
 <div class="container mt-4">
 
-    <h2>Search Animal API</h2>
+    <h2>Search API</h2>
 
     <form method="POST" class="d-flex mb-4">
         {% csrf_token %}
-        <input type="text" class="form-control me-2" name="query"
+        <input type="search" class="form-control me-2" name="query"
                value="{{ query }}" placeholder="Search for animals...">
         <button class="btn btn-primary">Search</button>
     </form>

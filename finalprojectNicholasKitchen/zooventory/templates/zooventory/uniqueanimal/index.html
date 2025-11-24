@@ -1,16 +1,16 @@
 {% extends 'zooventory/base.html' %}
 
-{% block title %}Unique Animals{% endblock %}
+{% block title %}Species{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Unique Animals</h2>
+        <h2>Species</h2>
 
         <div>
-            <a href="{% url 'uniqueanimal_search' %}" class="btn btn-primary">Search API</a>
-            <a href="{% url 'uniqueanimal_create' %}" class="btn btn-success">Create New</a>
+            <a href="{% url 'uniqueanimal_search' %}" class="btn btn-primary">Add From API</a>
+            <a href="{% url 'uniqueanimal_create' %}" class="btn btn-success">Add New Species</a>
         </div>
     </div>
 
