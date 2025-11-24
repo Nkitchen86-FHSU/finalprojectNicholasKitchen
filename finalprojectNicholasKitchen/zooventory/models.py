@@ -133,11 +133,16 @@ class Log(models.Model):
     log_type = models.CharField(max_length=50, choices=LOG_TYPE_CHOICES, default=FEEDING)
     description = models.TextField(null=True, blank=True)
 
+    # Track original inputs for reports
     amount_fed = models.FloatField(null=True, blank=True)
     unit = models.TextField(null=True, blank=True)
 
-    weight_lb = models.TextField(null=True, blank=True)
-    weight_oz = models.TextField(null=True, blank=True)
+    # Convert inputs to make chart comparisons easier
+    converted_amount_grams = models.FloatField(null=True, blank=True)
+    converted_amount_ml = models.FloatField(null=True, blank=True)
+
+    weight_lb = models.PositiveIntegerField(null=True, blank=True)
+    weight_oz = models.PositiveIntegerField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

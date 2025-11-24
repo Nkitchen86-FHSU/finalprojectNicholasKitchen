@@ -194,15 +194,17 @@ def myanimal_delete(request, id):
 # UniqueAnimal CRUD
 # -----------------------------
 
+@login_required
 def uniqueanimal_index(request):
     uniqueanimals = UniqueAnimal.objects.all()
     return render(request, 'zooventory/uniqueanimal/index.html', {'uniqueanimals': uniqueanimals})
 
-
+@login_required
 def uniqueanimal_info(request, id):
     uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
     return render(request, 'zooventory/uniqueanimal/info.html', {'uniqueanimal': uniqueanimal})
 
+@login_required
 def uniqueanimal_create(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -294,6 +296,7 @@ def uniqueanimal_create(request):
     return render(request, 'zooventory/uniqueanimal/create.html')
 
 # Alternate create function so the Animals API doesn't get searched twice
+@login_required
 def uniqueanimal_create_api(request):
     UniqueAnimal.objects.create(
         name=request.POST.get('name'),
@@ -325,6 +328,7 @@ def uniqueanimal_create_api(request):
     messages.success(request, 'UniqueAnimal added successfully!')
     return redirect('uniqueanimal_index')
 
+@login_required
 def uniqueanimal_update(request, id):
     uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
 
@@ -371,6 +375,7 @@ def uniqueanimal_update(request, id):
 
     return render(request, 'zooventory/uniqueanimal/update.html', {'uniqueanimal': uniqueanimal})
 
+@login_required
 def uniqueanimal_search(request):
     results = None
     query = ''
@@ -531,6 +536,7 @@ def feed_myanimal(request):
         'food': food_items,
     })
 
+@login_required
 def weigh_myanimal(request):
     myanimals = MyAnimal.objects.filter(owner=request.user)
 
@@ -553,8 +559,8 @@ def weigh_myanimal(request):
             messages.error(request, 'Weight inputs cannot be negative.')
             return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
 
-        myanimal.weight_lb = weight_lb
-        myanimal.weight_oz = weight_oz
+        myanimal.weight_lb = int(weight_lb)
+        myanimal.weight_oz = int(weight_oz)
         myanimal.save()
         Log.objects.create(owner=request.user, myanimal=myanimal, log_type=Log.WEIGHT_UPDATE, description=notes, weight_lb=weight_lb, weight_oz=weight_oz)
         messages.success(request, 'Weight updated successfully!')
