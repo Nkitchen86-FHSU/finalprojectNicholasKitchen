@@ -3,8 +3,72 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="text-center mt-5">
-    <h1>Welcome to your dashboard!</h1>
-    <p>Select what you want from the tabs up above.</p>
+
+<div class="container py-5">
+
+    <div class="text-center mb-4">
+        <h1>Your Dashboard</h1>
+        <p class="text-muted">Your feeding activity, food usage, and animal stats at a glance.</p>
+    </div>
+
+    <!-- CHART ROW 1 -->
+    <div class="row g-4 mb-4">
+
+        <!-- Chart 1 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-light fw-bold">
+                    Food Usage Over Time
+                </div>
+                <div class="card-body">
+                    <canvas id="foodUsageChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-light fw-bold">
+                    Feeding Frequency by Animal
+                </div>
+                <div class="card-body">
+                    <canvas id="feedingFrequencyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHART ROW 2 -->
+    <div class="row g-4 mb-4">
+
+        <!-- Chart 3 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning fw-bold">
+                    Top Food Consumption
+                </div>
+                <div class="card-body">
+                    <canvas id="topFoodChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 4 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-light fw-bold">
+                    Animal Weight Trends
+                </div>
+                <div class="card-body">
+                    <canvas id="weightTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
 {% endblock %}

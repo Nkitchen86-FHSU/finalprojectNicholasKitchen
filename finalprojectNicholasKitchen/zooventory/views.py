@@ -99,22 +99,26 @@ def myanimal_create(request):
         name = request.POST.get('name')
         species = request.POST.get('species')
         age = request.POST.get('age')
+        weight_lb = request.POST.get('weight_lb')
+        weight_oz = request.POST.get('weight_oz')
 
-        # Ensure myanimal age is an integer
+        # Ensure myanimal age and weight is an integer
         try:
             int(age)
+            int(weight_lb)
+            int(weight_oz)
         except ValueError:
-            messages.error(request, "Age must be an integer.")
+            messages.error(request, "Age and weight must be an integer.")
             return render(request, 'zooventory/myanimal/create.html')
 
         # Ensure myanimal age is more than 0
-        if int(age) <= 0:
-            messages.error(request, "Age must be over 0.")
+        if int(age) <= 0 or int(weight_lb) < 0 or int(weight_oz) < 0:
+            messages.error(request, "Age and weight must be over 0.")
             return render(request, 'zooventory/myanimal/create.html')
 
         # Create myanimal if all required field are filled
-        if name and species and age:
-            MyAnimal.objects.create(owner=request.user, name=name, species=species, age=age)
+        if name and species and age and weight_lb and weight_oz:
+            MyAnimal.objects.create(owner=request.user, name=name, species=species, age=age, weight_lb=weight_lb, weight_oz=weight_oz)
             messages.success(request, 'MyAnimal added successfully!')
             return redirect('myanimal_index')
         else:

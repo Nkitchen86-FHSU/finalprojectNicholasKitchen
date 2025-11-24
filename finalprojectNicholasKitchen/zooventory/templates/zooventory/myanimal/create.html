@@ -28,6 +28,22 @@
           <label for="age" class="form-label">Age</label>
           <input name="age" id="age" type="number" min="0" class="form-control" value="{{ form.age.value|default_if_none:'' }}" required>
         </div>
+        <div class="mb-3">
+            <label class="form-label">Weight</label>
+            <div class="d-flex align-items-center gap-2">
+                <input name="weight_lb" id="weight_lb"
+                       type="number" min="0"
+                       class="form-control w-auto"
+                       value="{{ form.weight_lb.value|default_if_none:'' }}" required>
+                <span>lb</span>
+
+                <input name="weight_oz" id="weight_oz"
+                       type="number" min="0"
+                       class="form-control w-auto"
+                       value="{{ form.weight_oz.value|default_if_none:'' }}" required>
+                <span>oz</span>
+            </div>
+        </div>
         <button type="submit" class="btn btn-success w-100">Save</button>
       </form>
     </div>

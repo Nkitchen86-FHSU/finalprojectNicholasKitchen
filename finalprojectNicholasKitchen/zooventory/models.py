@@ -54,7 +54,9 @@ class MyAnimal(models.Model):
     unique_animal = models.ForeignKey(UniqueAnimal, on_delete=models.SET_NULL, null=True, blank=True, related_name='instances')
     name = models.CharField(max_length=100)
     species = models.CharField(max_length=100)
-    age = models.PositiveIntegerField()  # CHECK (age >= 0) → PositiveIntegerField
+    age = models.PositiveIntegerField(default=1)  # CHECK (age >= 0)
+    weight_lb = models.PositiveIntegerField(default=0) # CHECK (weight >= 0)
+    weight_oz = models.PositiveIntegerField(default=0) # CHECK (weight >= 0)
     last_fed = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
@@ -133,6 +135,9 @@ class Log(models.Model):
 
     amount_fed = models.FloatField(null=True, blank=True)
     unit = models.TextField(null=True, blank=True)
+
+    weight_lb = models.TextField(null=True, blank=True)
+    weight_oz = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
