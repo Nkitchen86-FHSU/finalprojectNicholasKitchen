@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-dark fw-bold">Animals</h1>
+        <h1 class="text-dark fw-bold">My Animals</h1>
         {% if user.is_authenticated %}
         <a href="{% url 'myanimal_create' %}" class="btn btn-primary">+ Add New Animal</a>
         {% endif %}
