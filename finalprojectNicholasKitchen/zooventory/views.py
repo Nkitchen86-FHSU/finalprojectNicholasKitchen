@@ -97,7 +97,7 @@ def myanimal_create(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        species = request.POST.get('species')
+        unique_animal = UniqueAnimal.objects.get(id=request.POST.get('unique_animal'))
         age = request.POST.get('age')
         weight_lb = request.POST.get('weight_lb')
         weight_oz = request.POST.get('weight_oz')
@@ -123,8 +123,8 @@ def myanimal_create(request):
             })
 
         # Create myanimal if all required field are filled
-        if name and species and age and weight_lb and weight_oz:
-            MyAnimal.objects.create(owner=request.user, name=name, species=species, age=age, weight_lb=weight_lb, weight_oz=weight_oz)
+        if name and unique_animal and age and weight_lb and weight_oz:
+            MyAnimal.objects.create(owner=request.user, unique_animal=unique_animal, name=name, species=unique_animal.name, age=age, weight_lb=weight_lb, weight_oz=weight_oz)
             messages.success(request, 'MyAnimal added successfully!')
             return redirect('myanimal_index')
         else:
@@ -163,8 +163,10 @@ def myanimal_update(request, id):
             })
 
         # Update and save myanimal changes
+        unique_animal = UniqueAnimal.objects.get(id=request.POST.get('unique_animal'))
+        myanimal.unique_animal = unique_animal
         myanimal.name = request.POST.get('name', myanimal.name)
-        myanimal.species = request.POST.get('species', myanimal.species)
+        myanimal.species = unique_animal.name
         myanimal.age = request.POST.get('age', myanimal.age)
         myanimal.save()
         messages.success(request, 'MyAnimal updated successfully!')

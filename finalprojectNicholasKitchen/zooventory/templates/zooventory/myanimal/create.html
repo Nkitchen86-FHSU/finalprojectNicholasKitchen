@@ -15,10 +15,10 @@
           <input name="name" id="name" class="form-control" value="{{ form.name.value|default_if_none:'' }}" required>
         </div>
         <div class="mb-3">
-          <label for="species" class="form-label">Species</label>
-          <select name="species" id="species" class="form-control" required>
+          <label for="unique_animal" class="form-label">Species</label>
+          <select name="unique_animal" id="unique_animal" class="form-control" required>
               {% for animal in uniqueanimals %}
-                  <option value="{{ animal.name }}" {% if animal.name == current_species %} selected {% endif %}>
+                  <option value="{{ animal.id }}" {% if animal.name == current_species %} selected {% endif %}>
                       {{ animal.name }}
                   </option>
               {% endfor %}
