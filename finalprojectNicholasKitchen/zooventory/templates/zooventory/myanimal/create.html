@@ -16,7 +16,13 @@
         </div>
         <div class="mb-3">
           <label for="species" class="form-label">Species</label>
-          <input name="species" id="species" class="form-control" value="{{ form.species.value|default_if_none:'' }}" required>
+          <select name="species" id="species" class="form-control" required>
+              {% for animal in uniqueanimals %}
+                  <option value="{{ animal.name }}" {% if animal.name == current_species %} selected {% endif %}>
+                      {{ animal.name }}
+                  </option>
+              {% endfor %}
+          </select>
         </div>
         <div class="mb-3">
           <label for="age" class="form-label">Age</label>

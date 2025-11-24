@@ -92,6 +92,9 @@ def myanimal_index(request):
 
 @login_required
 def myanimal_create(request):
+    uniqueanimals = UniqueAnimal.objects.all()
+    default_species = uniqueanimals[0].name if uniqueanimals else ""
+
     if request.method == 'POST':
         name = request.POST.get('name')
         species = request.POST.get('species')
@@ -117,7 +120,10 @@ def myanimal_create(request):
         else:
             messages.error(request, 'Please fill out all required fields.')
 
-    return render(request, 'zooventory/myanimal/create.html')
+    return render(request, 'zooventory/myanimal/create.html', {
+        'uniqueanimals': UniqueAnimal.objects.all(),
+        'current_species': default_species
+    })
 
 
 @login_required
@@ -145,7 +151,11 @@ def myanimal_update(request, id):
         messages.success(request, 'MyAnimal updated successfully!')
         return redirect('myanimal_index')
 
-    return render(request, 'zooventory/myanimal/update.html', {'myanimal': myanimal})
+    return render(request, 'zooventory/myanimal/update.html', {
+        'myanimal': myanimal,
+        'uniqueanimals': UniqueAnimal.objects.all(),
+        'current_species': myanimal.species,
+    })
 
 
 @login_required

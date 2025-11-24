@@ -26,7 +26,7 @@
                     <select class="form-select" name="food_id" id="food_id" required>
                         <option value="">-- Choose food --</option>
                         {% for f in food %}
-                            <option value="{{ f.id }}">{{ f.name }} ({{ f.amount }} {{ f.measurement }} left)</option>
+                            <option value="{{ f.id }}">{{ f.name }} ({{ f.amount }} {{ f.get_unit_display }} left)</option>
                         {% endfor %}
                     </select>
                 </div>
