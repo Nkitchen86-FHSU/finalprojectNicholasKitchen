@@ -20,7 +20,7 @@
                         <h5 class="mb-0">{{ f.name }}</h5>
                     </div>
                     <div class="card-body" style="background-color: #f5f5dc;">
-                        <p class="mb-2"><strong>Amount:</strong> {{ f.amount }} {{ f.measurement }}</p>
+                        <p class="mb-2"><strong>Amount:</strong> {{ f.amount }} {{ f.get_unit_display }}</p>
 
                         {% if user.id == f.owner.id %}
                         <a href="{% url 'food_update' f.id %}" class="btn btn-outline-success btn-sm mt-2">Edit</a>

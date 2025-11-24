@@ -373,7 +373,7 @@ def food_create(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         amount = request.POST.get('amount')
-        measurement = request.POST.get('measurement')
+        unit = request.POST.get('unit')
 
         # Ensure amount is a number
         try:
@@ -388,14 +388,14 @@ def food_create(request):
             return render(request, 'zooventory/food/create.html')
 
         # Create the food object if required fields are filled
-        if name and amount and measurement:
-            Food.objects.create(owner=request.user, name=name, amount=amount, measurement=measurement)
+        if name and amount and unit:
+            Food.objects.create(owner=request.user, name=name, amount=amount, unit=unit)
             messages.success(request, 'Food added successfully!')
             return redirect('food_index')
         else:
             messages.error(request, 'Please fill out all fields.')
 
-    return render(request, 'zooventory/food/create.html')
+    return render(request, 'zooventory/food/create.html', { 'unit_choices': Food.UNIT_CHOICES })
 
 
 @login_required
@@ -418,12 +418,12 @@ def food_update(request, id):
         # Save the changes
         food.name = request.POST.get('name', food.name)
         food.amount = request.POST.get('amount', food.amount)
-        food.measurement = request.POST.get('measurement', food.measurement)
+        food.unit = request.POST.get('unit', food.unit)
         food.save()
         messages.success(request, 'Food updated successfully!')
         return redirect('food_index')
 
-    return render(request, 'zooventory/food/update.html', {'food': food})
+    return render(request, 'zooventory/food/update.html', {'food': food, 'unit_choices': Food.UNIT_CHOICES})
 
 
 @login_required
@@ -456,7 +456,7 @@ def feed_myanimal(request):
 
         myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
         food = get_object_or_404(Food, id=food_id, owner=request.user)
-        food_measurement = food.measurement
+        food_unit = food.unit
 
         # Ensure food amount is more than 0
         if food.amount > 0:
@@ -471,7 +471,7 @@ def feed_myanimal(request):
                     myanimal=myanimal,
                     food=food,
                     amount_fed=amount,
-                    measurement=food_measurement,
+                    unit=food_unit,
                     log_type=Log.FEEDING,
                     description=notes
                 )

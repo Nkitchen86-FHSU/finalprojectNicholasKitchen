@@ -19,8 +19,12 @@
           <input name="amount" id="amount" class="form-control" value="{{ form.amount.value|default_if_none:'' }}" required>
         </div>
         <div class="mb-3">
-          <label for="measurement" class="form-label">Measurement</label>
-          <input name="measurement" id="measurement" class="form-control" value="{{ form.measurement.value|default_if_none:'' }}" required>
+          <label for="unit" class="form-label">Unit</label>
+          <select name="unit" id="unit" class="form-control" required>
+              {% for value, label in unit_choices %}
+                  <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+          </select>
         </div>
         <button type="submit" class="btn btn-success w-100">Save</button>
       </form>

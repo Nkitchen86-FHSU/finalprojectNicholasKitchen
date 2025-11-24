@@ -63,17 +63,17 @@ class MyAnimal(models.Model):
 
 # --- Food model ---
 class Food(models.Model):
-    # Weight measurements
+    # Weight Units
     GRAM = 'g'
     OUNCE = 'oz'
     POUND = 'lb'
 
-    # Volume Measurements
+    # Volume Units
     FLUID_OUNCE = 'fl oz'
     GALLON = 'gal'
     LITER = 'l'
 
-    MEASUREMENT_CHOICES = (
+    UNIT_CHOICES = (
         (GRAM, 'g'),
         (OUNCE, 'oz'),
         (POUND, 'lb'),
@@ -85,10 +85,10 @@ class Food(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='foods')
     name = models.CharField(max_length=100)
     amount = models.FloatField(null=True, blank=True)  # CHECK (amount >= 0)
-    measurement = models.CharField(max_length=20, choices=MEASUREMENT_CHOICES, default=POUND)
+    unit = models.CharField(max_length=20, choices=UNIT_CHOICES, default=POUND)
 
     def __str__(self):
-        return f"{self.name} - {self.amount} {self.measurement}"
+        return f"{self.name} - {self.amount} {self.unit}"
 
 # --- Feeding Schedule model ---
 class FeedingSchedule(models.Model):
@@ -132,7 +132,7 @@ class Log(models.Model):
     description = models.TextField(null=True, blank=True)
 
     amount_fed = models.FloatField(null=True, blank=True)
-    measurement = models.TextField(null=True, blank=True)
+    unit = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

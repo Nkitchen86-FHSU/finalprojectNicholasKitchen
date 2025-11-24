@@ -12,6 +12,6 @@ class MyAnimalAdmin(admin.ModelAdmin):
 
 @admin.register(Food)
 class FoodAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'amount', 'measurement', 'owner')
+    list_display = ('id', 'name', 'amount', 'unit', 'owner')
     search_fields = ('name', 'owner__username')
     ordering = ('name',)
