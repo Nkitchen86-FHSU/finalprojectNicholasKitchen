@@ -5,7 +5,7 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import MyAnimal, UniqueAnimal, Food
+from .models import MyAnimal, UniqueAnimal, Food, Log
 from django.utils import timezone
 from django.conf import settings
 
@@ -452,9 +452,11 @@ def feed_myanimal(request):
         myanimal_id = request.POST.get('myanimal_id')
         food_id = request.POST.get('food_id')
         amount = float(request.POST.get('amount', 0))
+        notes = request.POST.get('notes')
 
         myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
         food = get_object_or_404(Food, id=food_id, owner=request.user)
+        food_measurement = food.measurement
 
         # Ensure food amount is more than 0
         if food.amount > 0:
@@ -464,6 +466,15 @@ def feed_myanimal(request):
                 food.save()
                 myanimal.last_fed = timezone.now()
                 myanimal.save()
+                Log.objects.create(
+                    owner=request.user,
+                    myanimal=myanimal,
+                    food=food,
+                    amount_fed=amount,
+                    measurement=food_measurement,
+                    log_type=Log.FEEDING,
+                    description=notes
+                )
                 messages.success(request, f'{myanimal.name} has been fed!')
             else:
                 messages.error(request, 'Not enough food to feed animal!')
