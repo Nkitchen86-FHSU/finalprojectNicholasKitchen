@@ -624,7 +624,7 @@ def chart_food_usage(request):
         data_grams.append(entry['total_grams'] if entry else 0)
         data_ml.append(entry['total_ml'] if entry else 0)
 
-    return JsonResponse({'labels': labels, 'grams': data_grams, 'ml': data_ml})
+    return JsonResponse({'labels': labels, 'data_grams': data_grams, 'data_ml': data_ml})
 
 @login_required
 def chart_feeding_frequency(request):
@@ -639,13 +639,38 @@ def chart_feeding_frequency(request):
     )
 
     labels = [entry['myanimal__name'] for entry in logs]
-    total = [entry['count'] for entry in logs]
+    data = [entry['count'] for entry in logs]
 
-    return JsonResponse({'labels': labels, 'total': total})
+    return JsonResponse({'labels': labels, 'data': data})
 
 @login_required
 def chart_top_food(request):
-    return
+    today = timezone.now().date()
+    start_date = today - timedelta(days=29)
+
+    logs = (
+        Log.objects.filter(owner=request.user, log_type=Log.FEEDING, created_at__gte=start_date)
+        .values('food__name')
+        .annotate(
+            grams=Sum('converted_amount_grams'),
+            ml=Sum('converted_amount_ml')
+        )
+    )
+
+    food_list = []
+    for entry in logs:
+        amount = entry['grams'] if entry['grams'] is not None else entry['ml']
+        food_list.append({
+            'name': entry['food__name'],
+            'amount': amount or 0,
+        })
+
+    top_foods = sorted(food_list, key=lambda food: food['amount'], reverse=True)[:5]
+
+    labels = [entry['name'] for entry in food_list]
+    data = [entry['amount'] for entry in food_list]
+
+    return JsonResponse({'labels': labels, 'data': data})
 
 @login_required
 def chart_weight_trends(request):

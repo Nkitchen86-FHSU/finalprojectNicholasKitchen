@@ -85,7 +85,7 @@
                 datasets: [
                     {
                         label: 'Grams Used',
-                        data: json.grams,
+                        data: json.data_grams,
                         borderWidth:2,
                         borderColor: 'green',
                         backgroundColor: 'rgba(0, 128, 0, 0.2)',
@@ -93,7 +93,7 @@
                     },
                     {
                         label: 'Milliliters Used',
-                        data: json.ml,
+                        data: json.data_ml,
                         borderWidth:2,
                         borderColor: 'blue',
                         backgroundColor: 'rgba(0, 0, 255, 0.2)',
@@ -131,8 +131,8 @@
                 datasets: [
                     {
                         label: 'Feedings',
-                        data: json.total,
-                        borderWidth:2,
+                        data: json.data,
+                        borderWidth: 2,
                         borderColor: 'rgba(0, 123, 255, 1)',
                         backgroundColor: 'rgba(0, 123, 255, 0.3)',
                     }
@@ -156,6 +156,45 @@
             }
         })
     })();
+
+    // Feeding Frequency Chart
+    (async function() {
+        const response = await fetch('{% url 'chart_top_food' %}');
+        const json = await response.json();
+
+        new Chart(document.getElementById('topFoodChart'), {
+            type: 'bar',
+            data: {
+                labels: json.labels,
+                datasets: [
+                    {
+                        label: 'Top Food Consumption',
+                        data: json.data,
+                        borderWidth: 2,
+                        borderColor: 'rgba(255, 180, 0, 1)',
+                        backgroundColor: 'rgba(255, 180, 0, 0.3)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        })
+    })();
+
 </script>
 
 {% endblock %}
