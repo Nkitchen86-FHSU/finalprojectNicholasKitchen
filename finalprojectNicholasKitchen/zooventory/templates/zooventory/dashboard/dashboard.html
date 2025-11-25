@@ -105,6 +105,14 @@
                 spanGaps: true,
                 scales: {
                     x: {
+                        title: {
+                            display: true,
+                            text: 'Date (MM-DD)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                         ticks: {
                             callback: function(value, index) {
                                 return this.getLabelForValue(value).slice(5);
@@ -112,7 +120,15 @@
                         }
                     },
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Food Used (grams / ml)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                     }
                 }
             }
@@ -142,12 +158,28 @@
                 responsive: true,
                 scales: {
                     x: {
+                        title: {
+                            display: true,
+                            text: 'Animal',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                         ticks: {
                             autoSkip: false
                         }
                     },
                     y: {
                         beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Feedings',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                         ticks: {
                             precision: 0
                         }
@@ -180,12 +212,28 @@
                 responsive: true,
                 scales: {
                     x: {
+                        title: {
+                            display: true,
+                            text: 'Food Item',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                         ticks: {
                             autoSkip: false
                         }
                     },
                     y: {
                         beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Consumption (grams / ml)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                         ticks: {
                             precision: 0
                         }
@@ -230,6 +278,14 @@
                 responsive: true,
                 scales: {
                     x: {
+                        title: {
+                          display: true,
+                          text: 'Date (MM-DD)',
+                          font: {
+                              size: 14,
+                              weight: 'bold'
+                          }
+                        },
                         ticks: {
                             callback: function(value) {
                                 return this.getLabelForValue(value).slice(5);
@@ -237,6 +293,14 @@
                         }
                     },
                     y: {
+                        title: {
+                          display: true,
+                          text: 'Weight (lbs)',
+                          font: {
+                              size: 14,
+                              weight: 'bold'
+                          }
+                        },
                         beginAtZero: true,
                     }
                 }
