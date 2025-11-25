@@ -157,7 +157,7 @@
         })
     })();
 
-    // Feeding Frequency Chart
+    // Top Consumption Chart
     (async function() {
         const response = await fetch('{% url 'chart_top_food' %}');
         const json = await response.json();
@@ -195,6 +195,54 @@
         })
     })();
 
+    // Weight Trends Chart
+    (async function() {
+        const response = await fetch('{% url 'chart_weight_trends' %}');
+        const json = await response.json();
+
+        const colors = [
+            'red', 'yellow', 'orange', 'brown', 'gold',
+            'teal', 'blue', 'purple', 'magenta', 'green'
+        ];
+
+        let colorIndex = 0;
+
+        const datasets = Object.keys(json.data).map(name => {
+            const dataset = {
+                label: name,
+                data: json.data[name],
+                borderWidth: 2,
+                borderColor: colors[colorIndex % colors.length],
+                backgroundColor: colors[colorIndex % colors.length] + '33',
+                tension: 0.3
+            };
+            colorIndex++;
+            return dataset;
+        });
+
+        new Chart(document.getElementById('weightTrendChart'), {
+            type: 'line',
+            data: {
+                labels: json.labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: function(value) {
+                                return this.getLabelForValue(value).slice(5);
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                    }
+                }
+            }
+        })
+    })();
 </script>
 
 {% endblock %}

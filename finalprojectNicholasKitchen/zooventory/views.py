@@ -602,20 +602,19 @@ def chart_food_usage(request):
     # Get all FEEDING logs
     logs = (
         Log.objects.filter(owner=request.user, log_type=Log.FEEDING, created_at__gte=start_date)
-        .annotate(created_date=TruncDate('created_at'))
-        .values('created_date')
+        .values('created_at__date')
         .annotate(
             total_grams=Sum('converted_amount_grams'),
             total_ml=Sum('converted_amount_ml')
         )
-        .order_by('created_date')
+        .order_by('created_at__date')
     )
 
     labels = []
     data_grams = []
     data_ml = []
 
-    log_map = {entry['created_date']: entry for entry in logs}
+    log_map = {entry['created_at__date']: entry for entry in logs}
 
     for date in date_list:
         labels.append(date.strftime('%Y-%m-%d'))
@@ -674,4 +673,41 @@ def chart_top_food(request):
 
 @login_required
 def chart_weight_trends(request):
-    return
+    today = timezone.now().date()
+    start_date = today - timedelta(days=29)
+    date_list = [start_date + timedelta(days=i) for i in range(30)]
+    labels = [d.strftime('%Y-%m-%d') for d in date_list]
+
+    logs = (
+        Log.objects.filter(owner=request.user, log_type=Log.WEIGHT_UPDATE, created_at__date__gte=start_date)
+        .values('myanimal__name', 'created_at__date', 'weight_lb', 'weight_oz')
+        .order_by('myanimal__name', 'created_at__date')
+    )
+
+    data = {}
+
+    for entry in logs:
+        name = entry['myanimal__name']
+
+        lb = entry['weight_lb'] or 0
+        oz = entry['weight_oz'] or 0
+        weight = lb + (oz/16)
+
+        if name not in data:
+            data[name] = [None] * 30
+
+        date_obj = entry['created_at__date']
+        index = (date_obj - start_date).days
+
+        if 0 <= index < 30:
+            data[name][index] = weight
+
+    for name, values in data.items():
+        last_value = None
+        for i in range(30):
+            if values[i] is None:
+                values[i] = last_value
+            else:
+                last_value = values[i]
+
+    return JsonResponse({'labels': labels, 'data': data})
