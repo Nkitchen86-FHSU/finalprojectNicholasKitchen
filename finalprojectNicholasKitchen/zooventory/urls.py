@@ -30,6 +30,12 @@ urlpatterns = [
     path('food/<int:id>/update/', views.food_update, name='food_update'),
     path('food/<int:id>/delete/', views.food_delete, name='food_delete'),
 
+    # Feeding Schedule URLs
+    path('myanimal/<int:id>/schedule/', views.feeding_schedule_index, name='feeding_schedule_index'),
+    path('myanimal/<int:id>/schedule/create/', views.feeding_schedule_create, name='feeding_schedule_create'),
+    path('schedule/<int:id>/update/', views.feeding_schedule_update, name='feeding_schedule_update'),
+    path('schedule/<int:id>/delete/', views.feeding_schedule_delete, name='feeding_schedule_delete'),
+
     # Calculator URLs
     path('calculator/feed/', views.feed_myanimal, name='feed_myanimal'),
     path('calculator/weigh/', views.weigh_myanimal, name='weigh_myanimal'),

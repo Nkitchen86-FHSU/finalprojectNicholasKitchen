@@ -592,7 +592,7 @@ def feeding_schedule_delete(request, id):
     schedule.delete()
 
     messages.success(request, 'Feeding schedule deleted successfully!')
-    return redirect('feeding_schedule_index', id=id)
+    return redirect('feeding_schedule_index', id=myanimal_id)
 
 
 # -----------------------------
