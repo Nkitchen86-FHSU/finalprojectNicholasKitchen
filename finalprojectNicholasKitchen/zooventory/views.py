@@ -300,6 +300,12 @@ def uniqueanimal_create(request):
 # Alternate create function so the Animals API doesn't get searched twice
 @login_required
 def uniqueanimal_create_api(request):
+    name = request.POST.get('name')
+    # Ensure the Unique Animal does not already exist in the database
+    if UniqueAnimal.objects.filter(name__iexact=name).exists():
+        messages.error(request, f'{name} already exists in the database!')
+        return redirect('uniqueanimal_index')
+
     UniqueAnimal.objects.create(
         name=request.POST.get('name'),
         scientific_name=request.POST.get('scientific_name'),
