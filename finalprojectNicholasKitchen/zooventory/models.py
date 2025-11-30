@@ -104,10 +104,21 @@ class FeedingSchedule(models.Model):
         (EVERY_X_HOURS, 'Every X Hours'),
     )
 
+    DAY_CHOICES = (
+        ('mon', 'Monday'),
+        ('tue', 'Tuesday'),
+        ('wed', 'Wednesday'),
+        ('thu', 'Thursday'),
+        ('fri', 'Friday'),
+        ('sat', 'Saturday'),
+        ('sun', 'Sunday'),
+    )
+
     myanimal = models.ForeignKey(MyAnimal, on_delete=models.CASCADE, related_name='feeding_schedules')
     time_of_day = models.TimeField(null=True, blank=True)
     frequency = models.CharField(max_length=50, choices=FREQUENCY_CHOICES, default=DAILY)
     hours_interval = models.IntegerField(null=True, blank=True)
+    day_of_week = models.CharField(max_length=10, choices=DAY_CHOICES, null=True, blank=True)
     next_run = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

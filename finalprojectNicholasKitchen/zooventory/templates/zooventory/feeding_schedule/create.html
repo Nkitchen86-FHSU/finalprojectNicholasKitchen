@@ -23,6 +23,19 @@
                     </select>
                 </div>
 
+                <!-- WEEKLY DAY SELECTION -->
+                <div class="mb-3 d-none" id="weeklyDayGroup">
+                    <label class="form-label fw-bold">Day of Week:</label>
+                    <select name="day_of_week" class="form-select">
+                        {% for value,label in day_choices %}
+                            <option value="{{ value }}"
+                                {% if schedule and schedule.day_of_week == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <!-- TIME OF DAY -->
                 <div class="mb-3" id="timeOfDayGroup">
                     <label class="form-label fw-bold">Time of Day:</label>
@@ -45,19 +58,33 @@
 </div>
 
 <script>
-document.getElementById("frequency").addEventListener("change", function() {
-    let val = this.value;
+function updateInputs() {
+    let frequency = document.getElementById("frequency").value;
 
     let timeGroup = document.getElementById("timeOfDayGroup");
     let hoursGroup = document.getElementById("hoursIntervalGroup");
+    let weeklyGroup = document.getElementById("weeklyDayGroup");
 
-    if (val === "every_x_hours") {
-        hoursGroup.classList.remove("d-none");
-        timeGroup.classList.add("d-none");
-    } else {
-        hoursGroup.classList.add("d-none");
+    timeGroup.classList.add("d-none");
+    hoursGroup.classList.add("d-none");
+    weeklyGroup.classList.add("d-none");
+
+    if (frequency === "daily") {
         timeGroup.classList.remove("d-none");
     }
-});
+    else if (frequency === "weekly") {
+        timeGroup.classList.remove("d-none");
+        weeklyGroup.classList.remove("d-none");
+    }
+    else if (frequency === "every_x_hours") {
+        hoursGroup.classList.remove("d-none");
+    }
+}
+
+document.getElementById("frequency").addEventListener("change", updateInputs);
+
+// Run once on page load
+updateInputs();
 </script>
+
 {% endblock %}

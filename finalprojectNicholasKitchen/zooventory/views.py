@@ -493,6 +493,7 @@ def feeding_schedule_create(request, id):
         frequency = request.POST.get('frequency')
         time_of_day = request.POST.get('time_of_day')
         hours_interval = request.POST.get('hours_interval')
+        day_of_week = request.POST.get('day_of_week')
 
         # Convert time_of_day to a Time object
         parsed_time = None
@@ -508,9 +509,20 @@ def feeding_schedule_create(request, id):
             if next_run < timezone.now():
                 next_run += timedelta(days=1)
 
-        elif frequency == FeedingSchedule.WEEKLY and parsed_time:
+        elif frequency == FeedingSchedule.WEEKLY and parsed_time and day_of_week:
             today = timezone.now().date()
-            next_run = timezone.make_aware(datetime.combine(today, parsed_time)) + timedelta(days=7)
+            today_weekday = today.weekday()
+            target = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].index(day_of_week)
+
+            days_ahead = (target - today_weekday) % 7
+            # Schedule for next week if already passed this week
+            if days_ahead < 0:
+                temp = timezone.make_aware(datetime.combine(today, parsed_time))
+                if temp < timezone.now():
+                    days_ahead = 7
+
+            run_date = today + timedelta(days=days_ahead)
+            next_run = timezone.make_aware(datetime.combine(run_date, parsed_time))
 
         elif frequency == FeedingSchedule.EVERY_X_HOURS:
             next_run = timezone.now() + timedelta(hours=int(hours_interval))
@@ -521,6 +533,7 @@ def feeding_schedule_create(request, id):
             frequency=frequency,
             time_of_day=time_of_day,
             hours_interval=hours_interval,
+            day_of_week=day_of_week,
             next_run=next_run,
         )
 
@@ -530,6 +543,7 @@ def feeding_schedule_create(request, id):
     return render(request, 'zooventory/feeding_schedule/create.html', {
         'myanimal': myanimal,
         'frequency_choices': FeedingSchedule.FREQUENCY_CHOICES,
+        'day_choices': FeedingSchedule.DAY_CHOICES,
     })
 
 @login_required
@@ -545,11 +559,13 @@ def feeding_schedule_update(request, id):
         frequency = request.POST.get('frequency')
         time_of_day = request.POST.get('time_of_day')
         hours_interval = request.POST.get('hours_interval')
+        day_of_week = request.POST.get('day_of_week')
 
         parsed_time = datetime.strptime(time_of_day, '%H:%M').time() if time_of_day else None
         schedule.frequency = frequency
         schedule.time_of_day = parsed_time
         schedule.hours_interval = hours_interval
+        schedule.day_of_week = request.POST.get('day_of_week')
 
         next_run = schedule.next_run
 
@@ -560,9 +576,21 @@ def feeding_schedule_update(request, id):
             if next_run < timezone.now():
                 next_run += timedelta(days=1)
 
-        elif frequency == FeedingSchedule.WEEKLY and parsed_time:
+
+        elif frequency == FeedingSchedule.WEEKLY and parsed_time and day_of_week:
             today = timezone.now().date()
-            next_run = timezone.make_aware(datetime.combine(today, parsed_time)) + timedelta(days=7)
+            today_weekday = today.weekday()
+            target = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].index(day_of_week)
+
+            days_ahead = (target - today_weekday) % 7
+            # Schedule for next week if already passed this week
+            if days_ahead < 0:
+                temp = timezone.make_aware(datetime.combine(today, parsed_time))
+                if temp < timezone.now():
+                    days_ahead = 7
+
+            run_date = today + timedelta(days=days_ahead)
+            next_run = timezone.make_aware(datetime.combine(run_date, parsed_time))
 
         elif frequency == FeedingSchedule.EVERY_X_HOURS:
             next_run = timezone.now() + timedelta(hours=int(hours_interval))
@@ -577,6 +605,7 @@ def feeding_schedule_update(request, id):
         'myanimal': myanimal,
         'schedule': schedule,
         'frequency_choices': FeedingSchedule.FREQUENCY_CHOICES,
+        'day_choices': FeedingSchedule.DAY_CHOICES,
     })
 
 @login_required
