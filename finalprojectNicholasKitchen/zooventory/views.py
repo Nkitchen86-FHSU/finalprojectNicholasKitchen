@@ -10,9 +10,9 @@ from django.http import JsonResponse
 from django.db.models import Sum
 from django.utils import timezone
 from django.conf import settings
-from .models import MyAnimal, UniqueAnimal, Food, Log
+from .models import MyAnimal, UniqueAnimal, Food, FeedingSchedule, Log
 from zooventory.utils.conversions import *
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 # -----------------------------
 # Fetch request for animal API
@@ -472,6 +472,128 @@ def food_delete(request, id):
         return redirect('food_index')
 
     return redirect('food_index')
+
+# -----------------------------
+# Feeding Schedule CRUD
+# -----------------------------
+
+@login_required
+def feeding_schedule_index(request, id):
+    myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
+    schedules = myanimal.feeding_schedules.all()
+    return render(request, 'zooventory/feeding_schedule/index.html', {
+        'myanimal': myanimal,
+        'schedules': schedules,
+    })
+
+@login_required
+def feeding_schedule_create(request, id):
+    myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
+
+    if request.method == 'POST':
+        frequency = request.POST.get('frequency')
+        time_of_day = request.POST.get('time_of_day')
+        hours_interval = request.POST.get('hours_interval')
+
+        # Convert time_of_day to a Time object
+        parsed_time = None
+        if time_of_day:
+            parsed_time = datetime.strptime(time_of_day, '%H:%M').time()
+
+        next_run = timezone.now()
+
+        # Compute the next_run
+        if frequency == FeedingSchedule.DAILY and parsed_time:
+            today = timezone.now().date()
+            next_run = timezone.make_aware(datetime.combine(today, parsed_time))
+            if next_run < timezone.now():
+                next_run += timedelta(days=1)
+
+        elif frequency == FeedingSchedule.WEEKLY and parsed_time:
+            today = timezone.now().date()
+            next_run = timezone.make_aware(datetime.combine(today, parsed_time)) + timedelta(days=7)
+
+        elif frequency == FeedingSchedule.EVERY_X_HOURS:
+            next_run = timezone.now() + timedelta(hours=int(hours_interval))
+
+        # Create the feeding schedule
+        FeedingSchedule.objects.create(
+            myanimal=myanimal,
+            frequency=frequency,
+            time_of_day=time_of_day,
+            hours_interval=hours_interval,
+            next_run=next_run,
+        )
+
+        messages.success(request, 'Feeding schedule created successfully!')
+        return redirect('feeding_schedule_index', id=id)
+
+    return render(request, 'zooventory/feeding_schedule/create.html', {
+        'myanimal': myanimal,
+        'frequency_choices': FeedingSchedule.FREQUENCY_CHOICES,
+    })
+
+@login_required
+def feeding_schedule_update(request, id):
+    schedule = get_object_or_404(FeedingSchedule, id=id, owner=request.user)
+    myanimal = schedule.myanimal
+
+    if schedule.myanimal.owner != request.user:
+        messages.error(request, 'You are not the owner of this feeding schedule!')
+        return redirect('feeding_schedule_index', id=id)
+
+    if request.method == 'POST':
+        frequency = request.POST.get('frequency')
+        time_of_day = request.POST.get('time_of_day')
+        hours_interval = request.POST.get('hours_interval')
+
+        parsed_time = datetime.strptime(time_of_day, '%H:%M').time() if time_of_day else None
+        schedule.frequency = frequency
+        schedule.time_of_day = parsed_time
+        schedule.hours_interval = hours_interval
+
+        next_run = schedule.next_run
+
+        # Recalculate next_run
+        if frequency == FeedingSchedule.DAILY and parsed_time:
+            today = timezone.now().date()
+            next_run = timezone.make_aware(datetime.combine(today, parsed_time))
+            if next_run < timezone.now():
+                next_run += timedelta(days=1)
+
+        elif frequency == FeedingSchedule.WEEKLY and parsed_time:
+            today = timezone.now().date()
+            next_run = timezone.make_aware(datetime.combine(today, parsed_time)) + timedelta(days=7)
+
+        elif frequency == FeedingSchedule.EVERY_X_HOURS:
+            next_run = timezone.now() + timedelta(hours=int(hours_interval))
+
+        schedule.next_run = next_run
+        schedule.save()
+
+        messages.success(request, 'Feeding schedule updated successfully!')
+        return redirect('feeding_schedule_index', id=id)
+
+    return render(request, 'zooventory/feeding_schedule/update.html', {
+        'myanimal': myanimal,
+        'schedule': schedule,
+        'frequency_choices': FeedingSchedule.FREQUENCY_CHOICES,
+    })
+
+@login_required
+def feeding_schedule_delete(request, id):
+    schedule = get_object_or_404(FeedingSchedule, id=id, owner=request.user)
+
+    if schedule.myanimal.owner != request.user:
+        messages.error(request, 'You are not the owner of this feeding schedule!')
+        return redirect('myanimal_index')
+
+    myanimal_id = schedule.myanimal.id
+    schedule.delete()
+
+    messages.success(request, 'Feeding schedule deleted successfully!')
+    return redirect('feeding_schedule_index', id=id)
+
 
 # -----------------------------
 # Calculator:
