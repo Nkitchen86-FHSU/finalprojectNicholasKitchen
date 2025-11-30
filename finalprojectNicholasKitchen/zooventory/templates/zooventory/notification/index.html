@@ -1,0 +1,49 @@
+{% extends 'zooventory/base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 700px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Your Notifications</h2>
+
+        <!-- Mark All as Read -->
+        <form method="post" action="{% url 'notification_mark_read' %}">
+            {% csrf_token %}
+            <button class="btn btn-success btn-sm">Mark All Read</button>
+        </form>
+    </div>
+
+    {% if notifications %}
+        <div class="list-group">
+
+            {% for n in notifications %}
+                <div class="list-group-item d-flex justify-content-between align-items-start 
+                            {% if not n.is_read %}bg-light{% endif %}">
+
+                    <div>
+                        <p class="mb-1 {% if not n.is_read %}fw-bold{% endif %}">
+                            {{ n.message }}
+                        </p>
+                        <small class="text-muted">{{ n.created_at }}</small>
+                    </div>
+
+                    <!-- Mark One as Read -->
+                    {% if not n.is_read %}
+                        <form method="post" action="{% url 'notification_mark_one' n.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-primary btn-sm">Mark Read</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+        <p class="text-muted text-center mt-4">You have no notifications.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

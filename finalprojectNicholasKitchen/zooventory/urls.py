@@ -45,4 +45,9 @@ urlpatterns = [
     path('chart/feeding-frequency', views.chart_feeding_frequency, name='chart_feeding_frequency'),
     path('chart/top-food', views.chart_top_food, name='chart_top_food'),
     path('chart/weight-trends', views.chart_weight_trends, name='chart_weight_trends'),
+
+    # Notification URLs
+    path('notification/', views.notification_index, name='notification_index'),
+    path('notification/mark-read/', views.notification_mark_read, name='notification_mark_read'),
+    path('notification/<int:id>/mark-read/', views.notification_mark_one, name='notification_mark_one'),
 ]

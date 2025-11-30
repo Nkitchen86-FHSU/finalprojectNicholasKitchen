@@ -43,7 +43,16 @@ main {
     border-color: #f5f5dc;
 }
 
+/* Default mailbox color */
+.mailbox-icon {
+    color: #f5f5dc;
+}
 
+/* When there are unread notifications, make the icon pop */
+.mailbox-icon.unread {
+    color: #ffc107; /* Bootstrap warning/yellow */
+    font-weight: bold;
+}
 
 /* Primary buttons (dark green) */
 .btn-primary {

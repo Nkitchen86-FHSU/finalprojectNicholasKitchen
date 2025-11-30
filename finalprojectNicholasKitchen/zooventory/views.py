@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from django.db.models import Sum
 from django.utils import timezone
 from django.conf import settings
-from .models import MyAnimal, UniqueAnimal, Food, FeedingSchedule, Log
+from .models import MyAnimal, UniqueAnimal, Food, FeedingSchedule, Log, Notification
 from .utils.conversions import *
 from datetime import datetime, timedelta
 
@@ -867,3 +867,24 @@ def chart_weight_trends(request):
                 last_value = values[i]
 
     return JsonResponse({'labels': labels, 'data': data})
+
+# -----------------------------
+# Notification:
+# - Index to View All
+# - Mark As Read
+# -----------------------------
+
+@login_required
+def notification_index(request):
+    notifications = Notification.objects.filter(owner=request.user).order_by('created_at')
+    return render(request, 'zooventory/notification/index.html', {'notifications': notifications})
+
+@login_required
+def notification_mark_read(request):
+    Notification.objects.filter(owner=request.user, is_read=False).update(is_read=True)
+    return redirect('notification_index')
+
+@login_required
+def notification_mark_one(request, id):
+    Notification.objects.filter(owner=request.user, id=id).update(is_read=True)
+    return redirect('notification_index')
