@@ -33,7 +33,6 @@ urlpatterns = [
     # Feeding Schedule URLs
     path('myanimal/<int:id>/schedule/', views.feeding_schedule_index, name='feeding_schedule_index'),
     path('myanimal/<int:id>/schedule/create/', views.feeding_schedule_create, name='feeding_schedule_create'),
-    path('schedule/<int:id>/update/', views.feeding_schedule_update, name='feeding_schedule_update'),
     path('schedule/<int:id>/delete/', views.feeding_schedule_delete, name='feeding_schedule_delete'),
 
     # Calculator URLs

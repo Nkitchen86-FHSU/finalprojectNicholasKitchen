@@ -502,42 +502,42 @@ def feeding_schedule_create(request, id):
         day_of_week = request.POST.get('day_of_week')
 
         # Convert time_of_day to a Time object
-        parsed_time = None
-        if time_of_day:
-            parsed_time = datetime.strptime(time_of_day, '%H:%M').time()
+        parsed_time = datetime.strptime(time_of_day, '%H:%M').time() if time_of_day else None
+        hours_interval = int(hours_interval) if hours_interval else None
 
         next_run = timezone.now()
 
         # Compute the next_run
+        # Daily
         if frequency == FeedingSchedule.DAILY and parsed_time:
-            today = timezone.now().date()
+            today = timezone.localdate()
             next_run = timezone.make_aware(datetime.combine(today, parsed_time))
             if next_run < timezone.now():
                 next_run += timedelta(days=1)
 
+        # Weekly
         elif frequency == FeedingSchedule.WEEKLY and parsed_time and day_of_week:
-            today = timezone.now().date()
-            today_weekday = today.weekday()
+            today = timezone.localdate()
+            today_wd = today.weekday()
             target = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].index(day_of_week)
 
-            days_ahead = (target - today_weekday) % 7
-            # Schedule for next week if already passed this week
-            if days_ahead < 0:
-                temp = timezone.make_aware(datetime.combine(today, parsed_time))
-                if temp < timezone.now():
-                    days_ahead = 7
-
+            days_ahead = (target - today_wd) % 7
             run_date = today + timedelta(days=days_ahead)
-            next_run = timezone.make_aware(datetime.combine(run_date, parsed_time))
 
-        elif frequency == FeedingSchedule.EVERY_X_HOURS:
-            next_run = timezone.now() + timedelta(hours=int(hours_interval))
+            next_run = timezone.make_aware(datetime.combine(run_date, parsed_time))
+            # Push to next week if time is already past
+            if next_run < timezone.now():
+                next_run += timedelta(days=7)
+
+        # Every X Hours
+        elif frequency == FeedingSchedule.EVERY_X_HOURS and hours_interval:
+            next_run = timezone.now() + timedelta(hours=hours_interval)
 
         # Create the feeding schedule
         FeedingSchedule.objects.create(
             myanimal=myanimal,
             frequency=frequency,
-            time_of_day=time_of_day,
+            time_of_day=parsed_time,
             hours_interval=hours_interval,
             day_of_week=day_of_week,
             next_run=next_run,
@@ -553,70 +553,8 @@ def feeding_schedule_create(request, id):
     })
 
 @login_required
-def feeding_schedule_update(request, id):
-    schedule = get_object_or_404(FeedingSchedule, id=id)
-    myanimal = schedule.myanimal
-
-    if schedule.myanimal.owner != request.user:
-        messages.error(request, 'You are not the owner of this feeding schedule!')
-        return redirect('feeding_schedule_index', id=id)
-
-    if request.method == 'POST':
-        frequency = request.POST.get('frequency')
-        time_of_day = request.POST.get('time_of_day')
-        hours_interval = request.POST.get('hours_interval')
-        day_of_week = request.POST.get('day_of_week')
-
-        parsed_time = datetime.strptime(time_of_day, '%H:%M').time() if time_of_day else None
-        schedule.frequency = frequency
-        schedule.time_of_day = parsed_time
-        schedule.hours_interval = hours_interval
-        schedule.day_of_week = request.POST.get('day_of_week')
-
-        next_run = schedule.next_run
-
-        # Recalculate next_run
-        if frequency == FeedingSchedule.DAILY and parsed_time:
-            today = timezone.now().date()
-            next_run = timezone.make_aware(datetime.combine(today, parsed_time))
-            if next_run < timezone.now():
-                next_run += timedelta(days=1)
-
-
-        elif frequency == FeedingSchedule.WEEKLY and parsed_time and day_of_week:
-            today = timezone.now().date()
-            today_weekday = today.weekday()
-            target = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].index(day_of_week)
-
-            days_ahead = (target - today_weekday) % 7
-            # Schedule for next week if already passed this week
-            if days_ahead < 0:
-                temp = timezone.make_aware(datetime.combine(today, parsed_time))
-                if temp < timezone.now():
-                    days_ahead = 7
-
-            run_date = today + timedelta(days=days_ahead)
-            next_run = timezone.make_aware(datetime.combine(run_date, parsed_time))
-
-        elif frequency == FeedingSchedule.EVERY_X_HOURS:
-            next_run = timezone.now() + timedelta(hours=int(hours_interval))
-
-        schedule.next_run = next_run
-        schedule.save()
-
-        messages.success(request, 'Feeding schedule updated successfully!')
-        return redirect('feeding_schedule_index', id=id)
-
-    return render(request, 'zooventory/feeding_schedule/update.html', {
-        'myanimal': myanimal,
-        'schedule': schedule,
-        'frequency_choices': FeedingSchedule.FREQUENCY_CHOICES,
-        'day_choices': FeedingSchedule.DAY_CHOICES,
-    })
-
-@login_required
 def feeding_schedule_delete(request, id):
-    schedule = get_object_or_404(FeedingSchedule, id=id, owner=request.user)
+    schedule = get_object_or_404(FeedingSchedule, id=id)
 
     if schedule.myanimal.owner != request.user:
         messages.error(request, 'You are not the owner of this feeding schedule!')
