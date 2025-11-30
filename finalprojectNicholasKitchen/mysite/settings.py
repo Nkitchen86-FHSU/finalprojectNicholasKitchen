@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'zooventory.apps.ZooventoryConfig',
     'django_extensions',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,9 @@ LOGIN_URL = 'login'
 # Load API Key
 load_dotenv()
 API_NINJAS_KEY = os.getenv('API_NINJAS_KEY')
+
+# Cron configuration
+CRONJOBS = [
+    # Runs every minute
+    ('* * * * *', 'zooventory.cron.check_feeding_schedules'),
+]
