@@ -534,7 +534,7 @@ def feeding_schedule_create(request, id):
 
 @login_required
 def feeding_schedule_update(request, id):
-    schedule = get_object_or_404(FeedingSchedule, id=id, owner=request.user)
+    schedule = get_object_or_404(FeedingSchedule, id=id)
     myanimal = schedule.myanimal
 
     if schedule.myanimal.owner != request.user:

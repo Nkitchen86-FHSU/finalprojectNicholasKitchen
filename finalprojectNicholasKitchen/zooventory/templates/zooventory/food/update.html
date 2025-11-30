@@ -16,7 +16,7 @@
         </div>
         <div class="mb-3">
           <label for="amount" class="form-label">Amount</label>
-          <input name="amount" id="amount" class="form-control" value="{{ form.amount.value|default:food.amount }}">
+          <input type="number" step="any" name="amount" id="amount" class="form-control" value="{{ form.amount.value|default:food.amount }}">
         </div>
         <div class="mb-3">
             <label for="unit" class="form-label">Unit</label>
