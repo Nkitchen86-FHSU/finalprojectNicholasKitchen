@@ -1,0 +1,63 @@
+{% extends 'zooventory/base.html' %}
+
+{% block title %}Create Feeding Schedule{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 650px;">
+    <div class="card shadow-lg">
+        <div class="card-header bg-success text-light text-center">
+            <h3>Create Feeding Schedule for {{ myanimal.name }}</h3>
+        </div>
+
+        <div class="card-body" style="background-color: #f5f5dc;">
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- FREQUENCY -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Feeding Frequency:</label>
+                    <select name="frequency" id="frequency" class="form-select" required>
+                        {% for value,label in frequency_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- TIME OF DAY -->
+                <div class="mb-3" id="timeOfDayGroup">
+                    <label class="form-label fw-bold">Time of Day:</label>
+                    <input type="time" name="time_of_day" class="form-control">
+                </div>
+
+                <!-- HOURS INTERVAL -->
+                <div class="mb-3 d-none" id="hoursIntervalGroup">
+                    <label class="form-label fw-bold">Hours Interval:</label>
+                    <input type="number" name="hours_interval" class="form-control" min="1" step="1">
+                </div>
+
+                <button class="btn btn-success btn-lg w-100">Create Schedule</button>
+
+                <a href="{% url 'feeding_schedule_index' myanimal.id %}"
+                   class="btn btn-secondary w-100 mt-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("frequency").addEventListener("change", function() {
+    let val = this.value;
+
+    let timeGroup = document.getElementById("timeOfDayGroup");
+    let hoursGroup = document.getElementById("hoursIntervalGroup");
+
+    if (val === "every_x_hours") {
+        hoursGroup.classList.remove("d-none");
+        timeGroup.classList.add("d-none");
+    } else {
+        hoursGroup.classList.add("d-none");
+        timeGroup.classList.remove("d-none");
+    }
+});
+</script>
+{% endblock %}

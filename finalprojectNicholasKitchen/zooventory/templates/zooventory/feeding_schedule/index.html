@@ -1,0 +1,60 @@
+{% extends 'zooventory/base.html' %}
+
+{% block title %}Feeding Schedule - {{ myanimal.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">{{ myanimal.name }} - Feeding Schedules</h2>
+
+    <div class="d-flex justify-content-between mb-3">
+        <a class="btn btn-secondary" href="{% url 'myanimal_index' %}">Back to My Animals</a>
+        <a class="btn btn-success" href="{% url 'feeding_schedule_create' myanimal.id %}">
+            + Create Schedule
+        </a>
+    </div>
+
+    {% if schedules %}
+        <div class="list-group">
+            {% for schedule in schedules %}
+                <div class="list-group-item shadow-sm mb-2">
+                    <h5 class="mb-1">
+                        Feeding: 
+                        <span class="text-primary">{{ schedule.frequency|capfirst }}</span>
+                    </h5>
+
+                    {% if schedule.frequency == "daily" or schedule.frequency == "weekly" %}
+                        <p class="mb-1">
+                            <strong>Time of Day:</strong> 
+                            {{ schedule.time_of_day }}
+                        </p>
+                    {% endif %}
+
+                    {% if schedule.frequency == "every_x_hours" %}
+                        <p class="mb-1">
+                            <strong>Every:</strong> {{ schedule.hours_interval }} hours
+                        </p>
+                    {% endif %}
+
+                    <p class="mb-2">
+                        <strong>Next Feed:</strong> {{ schedule.next_run }}
+                    </p>
+
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-warning btn-sm"
+                           href="{% url 'feeding_schedule_update' schedule.id %}">
+                           Edit
+                        </a>
+                        <a class="btn btn-danger btn-sm"
+                           href="{% url 'feeding_schedule_delete' schedule.id %}">
+                           Delete
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <p class="text-center text-muted mt-4">No feeding schedules created yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
