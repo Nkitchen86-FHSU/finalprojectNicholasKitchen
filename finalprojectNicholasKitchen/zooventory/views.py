@@ -10,7 +10,7 @@ from django.db.models import Sum
 from django.utils import timezone
 from django.conf import settings
 from .models import MyAnimal, UniqueAnimal, Food, FeedingSchedule, Log
-from zooventory.utils.conversions import *
+from .utils.conversions import *
 from datetime import datetime, timedelta
 
 # -----------------------------
