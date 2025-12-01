@@ -505,33 +505,35 @@ def feeding_schedule_create(request, id):
         parsed_time = datetime.strptime(time_of_day, '%H:%M').time() if time_of_day else None
         hours_interval = int(hours_interval) if hours_interval else None
 
-        next_run = timezone.now()
+        local = timezone.get_current_timezone()
+        now = timezone.now()
+        today = timezone.localdate()
+
+        next_run = now
 
         # Compute the next_run
         # Daily
         if frequency == FeedingSchedule.DAILY and parsed_time:
-            today = timezone.localdate()
-            next_run = timezone.make_aware(datetime.combine(today, parsed_time))
-            if next_run < timezone.now():
+            next_run = timezone.make_aware(datetime.combine(today, parsed_time), local)
+            if next_run <= now:
                 next_run += timedelta(days=1)
 
         # Weekly
         elif frequency == FeedingSchedule.WEEKLY and parsed_time and day_of_week:
-            today = timezone.localdate()
             today_wd = today.weekday()
             target = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].index(day_of_week)
 
             days_ahead = (target - today_wd) % 7
             run_date = today + timedelta(days=days_ahead)
 
-            next_run = timezone.make_aware(datetime.combine(run_date, parsed_time))
+            next_run = timezone.make_aware(datetime.combine(run_date, parsed_time), local)
             # Push to next week if time is already past
-            if next_run < timezone.now():
+            if days_ahead == 0 and next_run <= now:
                 next_run += timedelta(days=7)
 
         # Every X Hours
         elif frequency == FeedingSchedule.EVERY_X_HOURS and hours_interval:
-            next_run = timezone.now() + timedelta(hours=hours_interval)
+            next_run = now + timedelta(hours=hours_interval)
 
         # Create the feeding schedule
         FeedingSchedule.objects.create(

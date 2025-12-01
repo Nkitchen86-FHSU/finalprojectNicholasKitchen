@@ -13,19 +13,18 @@ def check_feeding_schedules():
         animal = schedule.myanimal
 
         # Create notification
-        Notification(owner=owner, message=f"It's time to feed {animal.name}")
+        Notification.objects.create(owner=owner, message=f"It's time to feed {animal.name}")
 
         # Recalculate next_run
-        next_run = calculate_next_run(schedule)
-        schedule.next_run = next_run
+        schedule.next_run = calculate_next_run(schedule)
         schedule.save()
 
 def calculate_next_run(schedule):
     now = timezone.now()
 
     # For Every X Hours
-    if schedule.frequency == schedule.EVERY_X_HOURS:
-        return now + timedelta(hours=schedule.hours_interval)
+    if schedule.frequency == schedule.EVERY_X_HOURS and schedule.hours_interval:
+        return schedule.next_run + timedelta(hours=schedule.hours_interval)
 
     # Require a time of day. If none, then set next feeding forward a day.
     if not schedule.time_of_day:
@@ -46,11 +45,13 @@ def calculate_next_run(schedule):
         today_wd = today.weekday()
 
         days_ahead = (target - today_wd) % 7
-        if days_ahead == 0 and time_today < now:
-            days_ahead = 7
-
         run_date = today + timedelta(days=days_ahead)
-        return timezone.make_aware(datetime.combine(run_date, schedule.time_of_day))
+        next_run = timezone.make_aware(datetime.combine(run_date, schedule.time_of_day))
+
+        if next_run < now:
+            next_run += timedelta(days=7)
+
+        return next_run
 
     # Fallback
     return now + timedelta(days=1)
