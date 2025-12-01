@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'zooventory.apps.ZooventoryConfig',
     'django_extensions',
+    'scheduler',
 ]
 
 MIDDLEWARE = [

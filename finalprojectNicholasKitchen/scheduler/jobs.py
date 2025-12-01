@@ -1,6 +1,7 @@
+from apscheduler.schedulers.background import BackgroundScheduler
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import FeedingSchedule, Notification
+from zooventory.models import FeedingSchedule, Notification
 
 
 def check_feeding_schedules():
@@ -55,3 +56,8 @@ def calculate_next_run(schedule):
 
     # Fallback
     return now + timedelta(days=1)
+
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(check_feeding_schedules, 'interval', minutes=1)
+    scheduler.start()
