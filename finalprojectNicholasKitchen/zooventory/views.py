@@ -816,7 +816,7 @@ def chart_weight_trends(request):
 
 @login_required
 def notification_index(request):
-    notifications = Notification.objects.filter(owner=request.user).order_by('created_at')
+    notifications = Notification.objects.filter(owner=request.user).order_by('-created_at')
     return render(request, 'zooventory/notification/index.html', {'notifications': notifications})
 
 @login_required
