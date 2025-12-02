@@ -44,6 +44,17 @@ Please create your admin user. You will need to enter a username and password. E
 python manage.py createsuperuser
 ```
 
+### Adding Test Data
+The file load_test_data.py can be used to load some test data for demo purposes. If you want to add test data, then run the following command:
+
+```
+python load_test_data.py
+```
+
+**Test Username: 1234test**
+
+**Test Password: 1234test**
+
 ### Executing program
 
 Please enter the following into the console to run the server:
