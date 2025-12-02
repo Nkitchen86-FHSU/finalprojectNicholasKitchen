@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.utils import timezone
 from django.conf import settings
 from .models import MyAnimal, UniqueAnimal, Food, FeedingSchedule, Log, Notification
@@ -92,7 +92,50 @@ def custom_login(request):
 @login_required
 def myanimal_index(request):
     myanimals = MyAnimal.objects.filter(owner=request.user)
-    return render(request, 'zooventory/myanimal/index.html', {'myanimals': myanimals})
+    species_list = (
+        MyAnimal.objects.filter(owner=request.user)
+        .order_by('species')
+        .values_list('species', flat=True)
+        .distinct()
+    )
+
+    # Sort by animal name ascending or descending
+    sort = request.GET.get('sort', 'name')
+    if sort == 'name_asc':
+        myanimals = myanimals.order_by('name')
+    elif sort == 'name_desc':
+        myanimals = myanimals.order_by('-name')
+
+    # Filter by species
+    species = request.GET.get('species')
+    if species and species != 'all':
+        myanimals = myanimals.filter(species__iexact=species)
+
+    # Filter by age range
+    age_range = request.GET.get('age_range')
+    if age_range:
+        if age_range == '1-10':
+            myanimals = myanimals.filter(age__gte=1, age__lte=10)
+        elif age_range == '11-20':
+            myanimals = myanimals.filter(age__gte=11, age__lte=20)
+        elif age_range == '21-30':
+            myanimals = myanimals.filter(age__gte=21, age__lte=30)
+        elif age_range == '30+':
+            myanimals = myanimals.filter(age__gte=31)
+
+    # Search by name
+    search = request.GET.get('search')
+    if search:
+        myanimals = myanimals.filter(Q(name__icontains=search))
+
+    return render(request, 'zooventory/myanimal/index.html', {
+        'myanimals': myanimals,
+        'sort': sort,
+        'species': species,
+        'species_list': species_list,
+        'age_range': age_range,
+        'search': search,
+    })
 
 @login_required
 def myanimal_create(request):
