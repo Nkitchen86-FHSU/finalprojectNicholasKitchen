@@ -469,7 +469,24 @@ def uniqueanimal_search(request):
 @login_required
 def food_index(request):
     food_list = Food.objects.filter(owner=request.user)
-    return render(request, 'zooventory/food/index.html', {'food_list': food_list})
+
+    # Sort by food name ascending or descending
+    sort = request.GET.get('sort', 'name')
+    if sort == 'name_asc':
+        food_list = food_list.order_by('name')
+    elif sort == 'name_desc':
+        food_list = food_list.order_by('-name')
+
+    # Search by name
+    search = request.GET.get('search')
+    if search:
+        food_list = food_list.filter(Q(name__icontains=search))
+
+    return render(request, 'zooventory/food/index.html', {
+        'food': food_list,
+        'sort': sort,
+        'search': search,
+    })
 
 @login_required
 def food_create(request):

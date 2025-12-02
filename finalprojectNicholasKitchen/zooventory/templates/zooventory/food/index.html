@@ -4,34 +4,76 @@
 
 {% block content %}
 <div class="container my-5">
+
+    <!-- Top Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="text-dark fw-bold">Food Inventory</h1>
-        {% if user.is_authenticated %}
         <a href="{% url 'food_create' %}" class="btn btn-primary">+ Add New Food</a>
-        {% endif %}
     </div>
 
-    {% if food_list %}
+    <!-- Search + Sort Form -->
+    <form method="GET" class="card p-3 shadow-sm mb-4" style="background-color: #f5f5dc;">
+        <div class="row g-3">
+
+            <!-- SEARCH -->
+            <div class="col-md-6">
+                <label class="fw-bold">Search by Name</label>
+                <input type="text" name="search" class="form-control"
+                       placeholder="Search food..."
+                       value="{{ search|default_if_none:'' }}">
+            </div>
+
+            <!-- SORT -->
+            <div class="col-md-4">
+                <label class="fw-bold">Sort</label>
+                <select name="sort" class="form-select">
+                    <option value="name_asc" {% if sort == 'name_asc' %}selected{% endif %}>Name A–Z</option>
+                    <option value="name_desc" {% if sort == 'name_desc' %}selected{% endif %}>Name Z–A</option>
+                </select>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div class="mt-3 text-end">
+                <button class="btn btn-success">Apply Filters</button>
+                <a href="{% url 'food_index' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- Food Cards -->
+    {% if food %}
         <div class="row row-cols-1 row-cols-md-2 g-4">
-            {% for f in food_list %}
+            {% for f in food %}
             <div class="col">
                 <div class="card shadow-sm border-0 h-100">
+
+                    <!-- Card Header -->
                     <div class="card-header text-light" style="background-color: #1e7e34;">
                         <h5 class="mb-0">{{ f.name }}</h5>
                     </div>
+
+                    <!-- Card Body -->
                     <div class="card-body" style="background-color: #f5f5dc;">
-                        <p class="mb-2"><strong>Amount:</strong> {{ f.amount }} {{ f.get_unit_display }}</p>
+                        <p class="mb-2">
+                            <strong>Amount:</strong> {{ f.amount }} {{ f.measurement }}
+                        </p>
 
                         {% if user.id == f.owner.id %}
-                        <a href="{% url 'food_update' f.id %}" class="btn btn-outline-success btn-sm mt-2">Edit</a>
+                        <a href="{% url 'food_update' f.id %}"
+                           class="btn btn-outline-success btn-sm mt-2">Edit</a>
                         {% endif %}
                     </div>
+
                 </div>
             </div>
             {% endfor %}
         </div>
+
     {% else %}
         <p class="text-center text-muted mt-5">No food items found.</p>
     {% endif %}
+
 </div>
 {% endblock %}
+
