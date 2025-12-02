@@ -242,7 +242,24 @@ def myanimal_delete(request, id):
 @login_required
 def uniqueanimal_index(request):
     uniqueanimals = UniqueAnimal.objects.all()
-    return render(request, 'zooventory/uniqueanimal/index.html', {'uniqueanimals': uniqueanimals})
+
+    # Sort by species name ascending or descending
+    sort = request.GET.get('sort', 'name')
+    if sort == 'name_asc':
+        uniqueanimals = uniqueanimals.order_by('name')
+    elif sort == 'name_desc':
+        uniqueanimals = uniqueanimals.order_by('-name')
+
+    # Search by name
+    search = request.GET.get('search')
+    if search:
+        uniqueanimals = uniqueanimals.filter(Q(name__icontains=search))
+
+    return render(request, 'zooventory/uniqueanimal/index.html', {
+        'uniqueanimals': uniqueanimals,
+        'sort': sort,
+        'search': search,
+    })
 
 @login_required
 def uniqueanimal_info(request, id):
