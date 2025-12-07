@@ -35,6 +35,9 @@ Please install all the required packages:
 ```
 pip install -r requirements.txt
 ```
+
+> [! Important]
+> A .env file is needed in the finalprojectNicholasKitchen folder with an api key for ninjas. Formatting need to look like this: API_NINJAS_KEY=Your_Key
  
 ### Installing
 
