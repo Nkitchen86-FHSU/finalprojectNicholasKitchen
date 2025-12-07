@@ -94,6 +94,7 @@ class Food(models.Model):
 
 # --- Feeding Schedule model ---
 class FeedingSchedule(models.Model):
+    # Frequencies
     DAILY = 'daily'
     WEEKLY = 'weekly'
     EVERY_X_HOURS = 'every_x_hours'
@@ -126,6 +127,7 @@ class FeedingSchedule(models.Model):
 
 # --- Log model ---
 class Log(models.Model):
+    # Log Types
     FEEDING = 'feeding'
     WEIGHT_UPDATE = 'weight_update'
     NOTE = 'note'

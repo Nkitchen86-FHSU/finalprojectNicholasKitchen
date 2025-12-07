@@ -3,12 +3,14 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from zooventory.models import FeedingSchedule, Notification
 
-
+# Function to check all feeding schedules for past times
 def check_feeding_schedules():
     now = timezone.now()
 
+    # Filter for all schedules with a date less than current time
     schedules = FeedingSchedule.objects.filter(next_run__lte=now)
 
+    # Send notification for each schedule and recalculate the next run
     for schedule in schedules:
         owner = schedule.myanimal.owner
         animal = schedule.myanimal
@@ -20,6 +22,7 @@ def check_feeding_schedules():
         schedule.next_run = calculate_next_run(schedule)
         schedule.save()
 
+# Helper function to calculate next run for feeding schedule
 def calculate_next_run(schedule):
     now = timezone.now()
 
@@ -36,6 +39,7 @@ def calculate_next_run(schedule):
 
     # For Daily
     if schedule.frequency == schedule.DAILY:
+        # Verify time is in the past
         if time_today > now:
             return time_today
         return time_today + timedelta(days=1)
@@ -49,6 +53,7 @@ def calculate_next_run(schedule):
         run_date = today + timedelta(days=days_ahead)
         next_run = timezone.make_aware(datetime.combine(run_date, schedule.time_of_day))
 
+        # Verify time is in the past
         if next_run < now:
             next_run += timedelta(days=7)
 
@@ -57,6 +62,7 @@ def calculate_next_run(schedule):
     # Fallback
     return now + timedelta(days=1)
 
+# Function to start the background scheduler
 def start_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(check_feeding_schedules, 'interval', minutes=1)

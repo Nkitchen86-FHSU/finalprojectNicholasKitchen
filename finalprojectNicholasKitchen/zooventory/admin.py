@@ -29,6 +29,7 @@ class FeedingScheduleAdmin(admin.ModelAdmin):
     search_fields = ('myanimal__name',)
     ordering = ('-next_run',)
 
+    # Feeding Schedules are read-only
     def has_add_permission(self, request):
         return False
 
@@ -44,6 +45,7 @@ class LogAdmin(admin.ModelAdmin):
     search_fields = ('log_type', 'owner__username', 'myanimal__name')
     ordering = ('-created_at',)
 
+    # Logs can be read or deleted
     def has_add_permission(self, request):
         return False
 
@@ -56,6 +58,7 @@ class NotificationAdmin(admin.ModelAdmin):
     search_fields = ('owner__username',)
     ordering = ('-created_at',)
 
+    # Notifications can be read or deleted
     def has_add_permission(self, request):
         return False
 

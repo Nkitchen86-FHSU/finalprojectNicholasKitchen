@@ -162,9 +162,17 @@ def myanimal_create(request):
                 'current_species': default_species
             })
 
-        # Ensure myanimal age is more than 0
+        # Ensure myanimal age and weight is more than 0
         if int(age) <= 0 or int(weight_lb) < 0 or int(weight_oz) < 0:
             messages.error(request, "Age and weight must be over 0.")
+            return render(request, 'zooventory/myanimal/create.html', {
+                'uniqueanimals': UniqueAnimal.objects.all(),
+                'current_species': default_species
+            })
+
+        # Ensure myanimal weight_lb and weight_oz are not both 0
+        if int(weight_lb) == 0 and int(weight_oz) == 0:
+            messages.error(request, "Weight cannot be zero.")
             return render(request, 'zooventory/myanimal/create.html', {
                 'uniqueanimals': UniqueAnimal.objects.all(),
                 'current_species': default_species
@@ -230,6 +238,7 @@ def myanimal_delete(request, id):
     myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
 
     if request.method == 'POST':
+        # Delete the myanimal object
         myanimal.delete()
         messages.success(request, 'MyAnimal deleted.')
         return redirect('myanimal_index')
@@ -264,6 +273,7 @@ def uniqueanimal_index(request):
 
 @login_required
 def uniqueanimal_info(request, id):
+    # Return information for selected unique animal
     uniqueanimal = get_object_or_404(UniqueAnimal, id=id)
     return render(request, 'zooventory/uniqueanimal/info.html', {'uniqueanimal': uniqueanimal})
 
@@ -550,6 +560,7 @@ def food_delete(request, id):
     food = get_object_or_404(Food, id=id, owner=request.user)
 
     if request.method == 'POST':
+        # Delete the food object
         food.delete()
         messages.success(request, 'Food deleted.')
         return redirect('food_index')
@@ -562,6 +573,7 @@ def food_delete(request, id):
 
 @login_required
 def feeding_schedule_index(request, id):
+    # Get all feeding schedules for selected animal
     myanimal = get_object_or_404(MyAnimal, id=id, owner=request.user)
     schedules = myanimal.feeding_schedules.all()
     return render(request, 'zooventory/feeding_schedule/index.html', {
@@ -636,10 +648,12 @@ def feeding_schedule_create(request, id):
 def feeding_schedule_delete(request, id):
     schedule = get_object_or_404(FeedingSchedule, id=id)
 
+    # Verify the owner is the current user
     if schedule.myanimal.owner != request.user:
         messages.error(request, 'You are not the owner of this feeding schedule!')
         return redirect('myanimal_index')
 
+    # Delete schedule and return to the animal
     myanimal_id = schedule.myanimal.id
     schedule.delete()
 
@@ -679,6 +693,7 @@ def feed_myanimal(request):
                 'food': food_items,
             })
 
+        # Verify amount is more than zero
         if float(amount) <= 0:
             messages.error(request, 'Amount must be over 0.')
             return render(request, 'zooventory/calculator/feed.html', {
@@ -738,6 +753,7 @@ def weigh_myanimal(request):
 
         myanimal = get_object_or_404(MyAnimal, id=myanimal_id, owner=request.user)
 
+        # Verify weight is an integer
         try:
             int(weight_lb)
             int(weight_oz)
@@ -745,10 +761,17 @@ def weigh_myanimal(request):
             messages.error(request, 'Weight inputs must be an integer.')
             return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
 
+        # Verify weight is 0 or more
         if int(weight_lb) < 0 or int(weight_oz) < 0:
             messages.error(request, 'Weight inputs cannot be negative.')
             return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
 
+        # Verify lb and oz are not both 0
+        if int(weight_lb) == 0 and int(weight_oz) == 0:
+            messages.error(request, 'Weight cannot be zero.')
+            return render(request, 'zooventory/calculator/weigh.html', {'myanimals': myanimals})
+
+        # Save animal weight and log change
         myanimal.weight_lb = weight_lb
         myanimal.weight_oz = weight_oz
         myanimal.save()
@@ -768,12 +791,12 @@ def weigh_myanimal(request):
 
 @login_required
 def chart_food_usage(request):
-    # Variables to display food usage over last 30 days
+    # Variables to display food usage over last 30 days, including today
     today = timezone.now().date()
     start_date = today - timedelta(days=29)
     date_list = [start_date + timedelta(days=i) for i in range(30)]
 
-    # Get all FEEDING logs
+    # Get all FEEDING logs in the date range and group by date.
     logs = (
         Log.objects.filter(owner=request.user, log_type=Log.FEEDING, created_at__gte=start_date)
         .values('created_at__date')
@@ -784,12 +807,15 @@ def chart_food_usage(request):
         .order_by('created_at__date')
     )
 
+    # Data arrays for the chart
     labels = []
     data_grams = []
     data_ml = []
 
+    # Convert the 'logs' results into a lookup by date
     log_map = {entry['created_at__date']: entry for entry in logs}
 
+    # Fill the data for each date in the range
     for date in date_list:
         labels.append(date.strftime('%Y-%m-%d'))
 
@@ -801,9 +827,11 @@ def chart_food_usage(request):
 
 @login_required
 def chart_feeding_frequency(request):
+    # Variables for the last 30 days
     today = timezone.now().date()
     start_date = today - timedelta(days=29)
 
+    # Get all feeding frequencies for each animal by name within the date range
     logs = (
         Log.objects.filter(owner=request.user, log_type=Log.FEEDING, created_at__gte=start_date)
         .values('myanimal__name')
@@ -811,6 +839,7 @@ def chart_feeding_frequency(request):
         .order_by('myanimal__name')
     )
 
+    # Data arrays for the chart
     labels = [entry['myanimal__name'] for entry in logs]
     data = [entry['count'] for entry in logs]
 
@@ -818,9 +847,11 @@ def chart_feeding_frequency(request):
 
 @login_required
 def chart_top_food(request):
+    # Variables for the last 30 days
     today = timezone.now().date()
     start_date = today - timedelta(days=29)
 
+    # Get all the food consumed for each name
     logs = (
         Log.objects.filter(owner=request.user, log_type=Log.FEEDING, created_at__gte=start_date)
         .values('food__name')
@@ -830,6 +861,7 @@ def chart_top_food(request):
         )
     )
 
+    # Create the list of each food and their amount used
     food_list = []
     for entry in logs:
         amount = entry['grams'] if entry['grams'] is not None else entry['ml']
@@ -838,44 +870,54 @@ def chart_top_food(request):
             'amount': amount or 0,
         })
 
+    # Only take the top 5 food based on amount
     top_foods = sorted(food_list, key=lambda food: food['amount'], reverse=True)[:5]
 
-    labels = [entry['name'] for entry in food_list]
-    data = [entry['amount'] for entry in food_list]
+    # Use top foods in the response
+    labels = [entry['name'] for entry in top_foods]
+    data = [entry['amount'] for entry in top_foods]
 
     return JsonResponse({'labels': labels, 'data': data})
 
 @login_required
 def chart_weight_trends(request):
+    # Variables for the last 30 days
     today = timezone.now().date()
     start_date = today - timedelta(days=29)
     date_list = [start_date + timedelta(days=i) for i in range(30)]
     labels = [d.strftime('%Y-%m-%d') for d in date_list]
 
+    # Get logs with WEIGHT_UPDATE
     logs = (
         Log.objects.filter(owner=request.user, log_type=Log.WEIGHT_UPDATE, created_at__date__gte=start_date)
         .values('myanimal__name', 'created_at__date', 'weight_lb', 'weight_oz')
         .order_by('myanimal__name', 'created_at__date')
     )
 
+    # Prepare data object for the chart
     data = {}
 
     for entry in logs:
         name = entry['myanimal__name']
 
+        # Convert lb and oz into a single weight value
         lb = entry['weight_lb'] or 0
         oz = entry['weight_oz'] or 0
         weight = lb + (oz/16)
 
+        # Initialize 30-day list for each animal
         if name not in data:
             data[name] = [None] * 30
 
+        # Determine which day this log represents
         date_obj = entry['created_at__date']
         index = (date_obj - start_date).days
 
+        # Store the weight if inside the range
         if 0 <= index < 30:
             data[name][index] = weight
 
+    # Fill missing days so the line chart doesn't break
     for name, values in data.items():
         last_value = None
         for i in range(30):
@@ -894,10 +936,13 @@ def chart_weight_trends(request):
 
 @login_required
 def notification_index(request):
+    # Filter all the notifications for the current user and show newest first
     notifications = Notification.objects.filter(owner=request.user).order_by('-created_at')
 
+    # Set max notifications per page
     paginator = Paginator(notifications, 10)
 
+    # Get the current page number and object
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -905,10 +950,12 @@ def notification_index(request):
 
 @login_required
 def notification_mark_read(request):
+    # Filter all notifications for current user and update them to being read
     Notification.objects.filter(owner=request.user, is_read=False).update(is_read=True)
     return redirect('notification_index')
 
 @login_required
 def notification_mark_one(request, id):
+    # Filter for the selected notification and update it to being read
     Notification.objects.filter(owner=request.user, id=id).update(is_read=True)
     return redirect('notification_index')
