@@ -1,6 +1,6 @@
 import requests
 
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
