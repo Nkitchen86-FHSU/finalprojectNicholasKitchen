@@ -8,9 +8,24 @@ Final Project - Zooventory
  
 ## Description
  
-Zooventory is an application that makes tracking animals and food easy. After getting signed up and logged in, the user can add animals and food items. The user can also edit and delete the animals and food items if needed. Whenever the user feeds an animal, they will use the calculator. The calculator does 2 things:
+Zooventory is an application that makes it easy to track animals, food consumption, and weight change. After getting signed up and logged in, the user will see a dashboard with information for the last 30 days.
+The user can add animals and food items, and edit and delete them if needed. 
+
+A user can also add animal species by either creating them themselves or using an API to autofill information.
+***Note: The species database is shared across all users. Therefore, the program will always favor the API's response for a species. When creating a species, the program will send a request to the API with the name of the animal.
+If an exact name match is found, the response from the API will be used and the user's input will be overwritten.*** Species cannot be deleted since other users could be using them, but they can be edited if your creation was successful.
+
+The user can use a feeding calculator or weight calculator provided inside the app.
+
+The feeding calculator does 2 things:
 1. It will subtract the entered amount from the food supply.
 2. It will log the last time an animal has been fed.
+
+The weight calculator does 2 things:
+1. It will set the weight for the selected animal.
+2. It will log the time of the weight change.
+
+The user can set feeding schedules for their animals. When a feeding time passes, a notification will display in the user's inbox for them to read.
  
 ## Getting Started
 
