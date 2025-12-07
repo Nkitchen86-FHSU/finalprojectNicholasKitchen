@@ -61,7 +61,7 @@ def custom_register(request):
 
         # Return error message with extra tag to automatically bring up register modal
         else:
-            messages.error(request, "Registration failed. Ensure inputs are correct. Note: Password must be 8 or more characters.", extra_tags='register-error')
+            messages.error(request, "Registration failed. Username may already be taken. Note: Password must be 8 or more characters.", extra_tags='register-error')
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
