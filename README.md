@@ -98,4 +98,6 @@ Nicholas Kitchen
 
 * [Django](https://docs.djangoproject.com/en/5.2/)
 * [Jinja](https://jinja.palletsprojects.com/en/stable/)
+* [APScheduler](https://apscheduler.readthedocs.io/en/3.x/)
+* [python-dotenv](https://pypi.org/project/python-dotenv/)
 * [ChatGPT](https://chatgpt.com/g/g-p-691368c335548191b6bc3f4285a9fc9e-finalprojectnicholaskitchen/project)
